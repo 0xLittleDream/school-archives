@@ -13,6 +13,8 @@ import About from "./pages/About";
 import Admin from "./pages/Admin";
 import CollectionDetail from "./pages/CollectionDetail";
 import CollectionEditor from "./pages/CollectionEditor";
+import CustomPage from "./pages/CustomPage";
+import PageBuilderEditorPage from "./pages/PageBuilderEditorPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -33,10 +35,12 @@ const App = () => (
             <Route path="/events" element={<Events />} />
             <Route path="/about" element={<About />} />
             <Route path="/collection/:id" element={<CollectionDetail />} />
+            <Route path="/page/:slug" element={<CustomPage />} />
             
             {/* Admin Routes */}
             <Route path="/admin" element={<Admin />} />
             <Route path="/admin/collection/:id" element={<CollectionEditor />} />
+            <Route path="/admin/page-builder/:id" element={<PageBuilderEditorPage />} />
             
             {/* Catch-all */}
             <Route path="*" element={<NotFound />} />
