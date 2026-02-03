@@ -30,6 +30,7 @@ import { CollectionCard } from '@/components/admin/CollectionCard';
 import { CollectionForm } from '@/components/admin/CollectionForm';
 import { BranchSelector } from '@/components/admin/BranchSelector';
 import { PhotoUploader } from '@/components/admin/PhotoUploader';
+import { PageEditor } from '@/components/admin/PageEditor';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import type { CollectionWithTags } from '@/types/database';
@@ -244,13 +245,7 @@ const Admin = () => {
 
           {/* Page Editor Tab */}
           <TabsContent value="pages">
-            <div className="bg-card rounded-2xl p-12 text-center border border-dashed border-border">
-              <FileEdit className="h-16 w-16 mx-auto text-muted-foreground/30 mb-4" />
-              <h3 className="font-display text-2xl font-semibold text-foreground mb-2">Page Editor</h3>
-              <p className="text-muted-foreground max-w-md mx-auto">
-                Coming soon. You'll be able to edit hero text, about sections, and other page content.
-              </p>
-            </div>
+            <PageEditor />
           </TabsContent>
         </Tabs>
       </div>
