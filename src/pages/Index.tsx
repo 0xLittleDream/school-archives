@@ -329,20 +329,12 @@ const Index = () => {
               Dive into our collection of cherished memories and relive the beautiful moments 
               that make our school community special.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild size="lg" className="h-14 px-8 font-semibold rounded-xl">
-                <Link to="/memories">
-                  <Camera className="w-5 h-5 mr-2" />
-                  Browse Memories
-                </Link>
-              </Button>
-              <Button asChild variant="outline" size="lg" className="h-14 px-8 font-semibold rounded-xl">
-                <Link to="/events">
-                  View Events
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Link>
-              </Button>
-            </div>
+            <Button asChild size="lg" className="h-14 px-8 font-semibold rounded-xl">
+              <Link to="/memories">
+                <Camera className="w-5 h-5 mr-2" />
+                Browse Memories
+              </Link>
+            </Button>
           </div>
         </div>
       </section>
