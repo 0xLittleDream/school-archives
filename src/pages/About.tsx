@@ -141,19 +141,12 @@ const About = () => {
             <p className="text-muted-foreground text-lg mb-8">
               Dive into our collection of memories and relive the moments that made our school special.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild size="lg" className="h-14 px-8">
-                <Link to="/memories">
-                  Browse Collections
-                  <ArrowRight className="h-4 w-4 ml-2" />
-                </Link>
-              </Button>
-              <Button asChild variant="outline" size="lg" className="h-14 px-8">
-                <Link to="/events">
-                  View Events
-                </Link>
-              </Button>
-            </div>
+            <Button asChild size="lg" className="h-14 px-8">
+              <Link to="/memories">
+                Browse Collections
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Link>
+            </Button>
           </div>
         </div>
       </section>
