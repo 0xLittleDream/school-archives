@@ -59,13 +59,13 @@ export function ImageGallerySection() {
       </div>
 
       {/* Scrolling Gallery Row 1 */}
-      <div className="relative mb-4">
-        <div className="flex gap-4 animate-scroll-left">
+      <div className="relative mb-4 overflow-hidden">
+        <div className="animate-scroll-left">
           {[...row1Photos, ...row1Photos].map((photo, i) => (
             <Link
-              key={i}
+              key={`row1-${i}`}
               to={photo.collectionId ? `/collection/${photo.collectionId}` : '/memories'}
-              className="flex-shrink-0 group"
+              className="flex-shrink-0 group px-2"
             >
               <div className="relative w-64 h-44 md:w-80 md:h-52 rounded-2xl overflow-hidden shadow-elegant hover:shadow-elegant-lg transition-all duration-300">
                 {isLoading ? (
@@ -76,6 +76,7 @@ export function ImageGallerySection() {
                       src={photo.url}
                       alt={photo.caption || 'Gallery image'}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      loading="lazy"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                     {photo.caption && (
@@ -92,13 +93,13 @@ export function ImageGallerySection() {
       </div>
 
       {/* Scrolling Gallery Row 2 - Reverse direction */}
-      <div className="relative">
-        <div className="flex gap-4 animate-scroll-right">
+      <div className="relative overflow-hidden">
+        <div className="animate-scroll-right">
           {[...row2Photos, ...row2Photos].map((photo, i) => (
             <Link
-              key={i}
+              key={`row2-${i}`}
               to={photo.collectionId ? `/collection/${photo.collectionId}` : '/memories'}
-              className="flex-shrink-0 group"
+              className="flex-shrink-0 group px-2"
             >
               <div className="relative w-52 h-36 md:w-72 md:h-44 rounded-2xl overflow-hidden shadow-elegant hover:shadow-elegant-lg transition-all duration-300">
                 {isLoading ? (
@@ -109,6 +110,7 @@ export function ImageGallerySection() {
                       src={photo.url}
                       alt={photo.caption || 'Gallery image'}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      loading="lazy"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                   </>
