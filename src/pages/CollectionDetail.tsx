@@ -4,10 +4,12 @@ import { Layout } from '@/components/layout/Layout';
 import { useCollection, usePhotos, useContentBlocks } from '@/hooks/useDatabase';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Calendar, MapPin, X, ChevronLeft, ChevronRight, Camera, Star } from 'lucide-react';
+import { ArrowLeft, Calendar, MapPin, X, ChevronLeft, ChevronRight, Camera, Star, Download } from 'lucide-react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { ShareButtons } from '@/components/ShareButtons';
+import { PhotoReactions } from '@/components/PhotoReactions';
+import { PhotoComments } from '@/components/PhotoComments';
 
 const CollectionDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -334,7 +336,7 @@ const CollectionDetail = () => {
                 <img
                   src={photos[currentPhotoIndex].image_url}
                   alt={photos[currentPhotoIndex].caption || `Photo ${currentPhotoIndex + 1}`}
-                  className="max-w-full max-h-[75vh] object-contain rounded-lg shadow-2xl"
+                  className="max-w-full max-h-[60vh] object-contain rounded-lg shadow-2xl"
                 />
                 <div className="mt-6 text-center">
                   {photos[currentPhotoIndex].caption && (
@@ -342,9 +344,25 @@ const CollectionDetail = () => {
                       {photos[currentPhotoIndex].caption}
                     </p>
                   )}
-                  <p className="text-white/50 text-sm">
+                  <p className="text-white/50 text-sm mb-4">
                     {currentPhotoIndex + 1} of {photos.length}
                   </p>
+                  
+                  {/* Reactions and Comments */}
+                  <div className="flex flex-wrap items-center justify-center gap-3">
+                    <PhotoReactions photoId={photos[currentPhotoIndex].id} />
+                    <PhotoComments photoId={photos[currentPhotoIndex].id} />
+                    <a
+                      href={photos[currentPhotoIndex].image_url}
+                      download
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all"
+                      title="Download photo"
+                    >
+                      <Download className="h-4 w-4" />
+                    </a>
+                  </div>
                 </div>
               </div>
             )}
