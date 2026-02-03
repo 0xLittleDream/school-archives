@@ -2,8 +2,13 @@ import { Link } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Camera, Calendar, ArrowRight } from 'lucide-react';
+import { useFeaturedCollections, useStats } from '@/hooks/useDatabase';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const Index = () => {
+  const { data: featuredCollections, isLoading: collectionsLoading } = useFeaturedCollections();
+  const { data: stats, isLoading: statsLoading } = useStats();
+
   return (
     <Layout>
       {/* Hero Section */}
@@ -40,7 +45,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Featured Collections Placeholder */}
+      {/* Featured Collections */}
       <section className="py-16 md:py-24">
         <div className="container">
           <div className="flex items-center justify-between mb-10">
@@ -59,28 +64,68 @@ const Index = () => {
             </Button>
           </div>
 
-          {/* Placeholder grid for collections */}
+          {/* Collections grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3].map((i) => (
-              <div
-                key={i}
-                className="group relative aspect-[4/3] rounded-xl bg-secondary overflow-hidden shadow-elegant animate-fade-in"
-                style={{ animationDelay: `${i * 100}ms` }}
-              >
-                <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/20 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-6">
-                  <span className="inline-block px-2 py-1 text-xs font-medium bg-accent text-accent-foreground rounded mb-2">
-                    Coming Soon
-                  </span>
-                  <h3 className="font-display text-xl font-semibold text-white">
-                    Collection {i}
-                  </h3>
-                  <p className="text-white/70 text-sm mt-1">
-                    Connect your Supabase database to see real collections
-                  </p>
-                </div>
+            {collectionsLoading ? (
+              // Loading skeletons
+              Array.from({ length: 3 }, (_, i) => (
+                <Skeleton key={i} className="aspect-[4/3] rounded-xl" />
+              ))
+            ) : featuredCollections && featuredCollections.length > 0 ? (
+              // Real collections
+              featuredCollections.slice(0, 6).map((collection, i) => (
+                <Link
+                  key={collection.id}
+                  to={`/collection/${collection.id}`}
+                  className="group relative aspect-[4/3] rounded-xl bg-secondary overflow-hidden shadow-elegant hover:shadow-elegant-lg transition-all animate-fade-in"
+                  style={{ animationDelay: `${i * 100}ms` }}
+                >
+                  {collection.cover_image_url ? (
+                    <img
+                      src={collection.cover_image_url}
+                      alt={collection.title}
+                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <Camera className="h-12 w-12 text-muted-foreground/30" />
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/20 to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 p-6">
+                    {collection.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 mb-2">
+                        {collection.tags.slice(0, 2).map((tag) => (
+                          <span
+                            key={tag.id}
+                            className="inline-block px-2 py-0.5 text-xs font-medium rounded"
+                            style={{ backgroundColor: tag.color, color: '#fff' }}
+                          >
+                            {tag.name}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    <h3 className="font-display text-xl font-semibold text-white">
+                      {collection.title}
+                    </h3>
+                    <p className="text-white/70 text-sm mt-1">
+                      {collection.photo_count} photos
+                      {collection.event_date && ` • ${new Date(collection.event_date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}`}
+                    </p>
+                  </div>
+                </Link>
+              ))
+            ) : (
+              // Empty state
+              <div className="col-span-full text-center py-12">
+                <Camera className="h-12 w-12 mx-auto text-muted-foreground/30 mb-4" />
+                <p className="text-muted-foreground">No featured collections yet.</p>
+                <p className="text-sm text-muted-foreground/70 mt-1">
+                  Add collections and mark them as featured in the admin dashboard.
+                </p>
               </div>
-            ))}
+            )}
           </div>
 
           <Button variant="ghost" asChild className="mt-6 md:hidden w-full gap-1">
@@ -96,15 +141,19 @@ const Index = () => {
         <div className="container">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {[
-              { value: '—', label: 'Photos' },
-              { value: '—', label: 'Collections' },
-              { value: '—', label: 'Events' },
-              { value: '—', label: 'Branches' },
+              { value: stats?.photos ?? '—', label: 'Photos' },
+              { value: stats?.collections ?? '—', label: 'Collections' },
+              { value: stats?.events ?? '—', label: 'Event Types' },
+              { value: stats?.branches ?? '—', label: 'Branches' },
             ].map((stat, i) => (
               <div key={i} className="text-center">
-                <p className="font-display text-3xl md:text-4xl font-bold text-primary">
-                  {stat.value}
-                </p>
+                {statsLoading ? (
+                  <Skeleton className="h-10 w-16 mx-auto mb-2" />
+                ) : (
+                  <p className="font-display text-3xl md:text-4xl font-bold text-primary">
+                    {stat.value}
+                  </p>
+                )}
                 <p className="text-muted-foreground mt-1">{stat.label}</p>
               </div>
             ))}
