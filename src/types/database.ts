@@ -42,22 +42,8 @@ export interface Photo {
   created_at: string;
 }
 
-// Content Block Types
+// Content Block Types (reserved for future use)
 export type ContentBlockType = 'image' | 'image_text' | 'text' | 'gallery';
-
-export interface ContentBlock {
-  id: string;
-  collection_id: string;
-  block_type: ContentBlockType;
-  title: string | null;
-  content: string | null;
-  image_url: string | null;
-  image_position: 'left' | 'right' | null;
-  gallery_images: string[] | null;
-  sort_order: number;
-  created_at: string;
-  updated_at: string;
-}
 
 // Event Types (for dynamic events)
 export interface Event {
