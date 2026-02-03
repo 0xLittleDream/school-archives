@@ -8,6 +8,7 @@ import Memories from "./pages/Memories";
 import Farewell2025 from "./pages/Farewell2025";
 import Events from "./pages/Events";
 import About from "./pages/About";
+import Admin from "./pages/Admin";
 import CollectionDetail from "./pages/CollectionDetail";
 import NotFound from "./pages/NotFound";
 
@@ -28,9 +29,8 @@ const App = () => (
           <Route path="/about" element={<About />} />
           <Route path="/collection/:id" element={<CollectionDetail />} />
           
-          {/* Admin Routes - Coming Soon */}
-          {/* <Route path="/admin/login" element={<AdminLogin />} /> */}
-          {/* <Route path="/admin" element={<AdminDashboard />} /> */}
+          {/* Admin Routes */}
+          <Route path="/admin" element={<Admin />} />
           
           {/* Catch-all */}
           <Route path="*" element={<NotFound />} />
