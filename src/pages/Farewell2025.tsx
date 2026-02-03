@@ -66,6 +66,20 @@ const Farewell2025 = () => {
     }
   };
 
+  // If no branch selected yet, the BranchSelectionModal will show
+  // Just render Layout with loading state so modal can overlay properly
+  if (!selectedBranchId) {
+    return (
+      <Layout>
+        <div className="container py-12">
+          <Skeleton className="h-64 w-full rounded-2xl mb-8" />
+          <Skeleton className="h-32 w-full rounded-2xl mb-8" />
+          <Skeleton className="h-48 w-full rounded-2xl" />
+        </div>
+      </Layout>
+    );
+  }
+
   if (isLoading) {
     return (
       <Layout>
