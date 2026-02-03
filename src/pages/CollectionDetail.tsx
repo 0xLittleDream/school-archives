@@ -4,9 +4,10 @@ import { Layout } from '@/components/layout/Layout';
 import { useCollection, usePhotos, useContentBlocks } from '@/hooks/useDatabase';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Calendar, MapPin, X, ChevronLeft, ChevronRight, Camera, Share2, Download, Star } from 'lucide-react';
+import { ArrowLeft, Calendar, MapPin, X, ChevronLeft, ChevronRight, Camera, Star } from 'lucide-react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
+import { ShareButtons } from '@/components/ShareButtons';
 
 const CollectionDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -144,27 +145,30 @@ const CollectionDetail = () => {
                 </p>
               )}
               
-              <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-muted-foreground">
-                {collection.event_date && (
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-muted-foreground">
+                  {collection.event_date && (
+                    <span className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary">
+                      <Calendar className="h-4 w-4 text-primary" />
+                      {new Date(collection.event_date).toLocaleDateString('en-US', { 
+                        month: 'long', 
+                        day: 'numeric',
+                        year: 'numeric' 
+                      })}
+                    </span>
+                  )}
+                  {collection.branch && (
+                    <span className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary">
+                      <MapPin className="h-4 w-4 text-primary" />
+                      {collection.branch.name}
+                    </span>
+                  )}
                   <span className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary">
-                    <Calendar className="h-4 w-4 text-primary" />
-                    {new Date(collection.event_date).toLocaleDateString('en-US', { 
-                      month: 'long', 
-                      day: 'numeric',
-                      year: 'numeric' 
-                    })}
+                    <Camera className="h-4 w-4 text-primary" />
+                    {collection.photo_count} photos
                   </span>
-                )}
-                {collection.branch && (
-                  <span className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary">
-                    <MapPin className="h-4 w-4 text-primary" />
-                    {collection.branch.name}
-                  </span>
-                )}
-                <span className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary">
-                  <Camera className="h-4 w-4 text-primary" />
-                  {collection.photo_count} photos
-                </span>
+                </div>
+                <ShareButtons title={collection.title} />
               </div>
             </div>
           </div>
