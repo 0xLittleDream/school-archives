@@ -6,14 +6,20 @@ import { useFeaturedCollections, useStats } from '@/hooks/useDatabase';
 import { useBranch } from '@/contexts/BranchContext';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ImageGallerySection } from '@/components/home/ImageGallerySection';
-
 const Index = () => {
-  const { selectedBranch, selectedBranchId } = useBranch();
-  const { data: featuredCollections, isLoading: collectionsLoading } = useFeaturedCollections(selectedBranchId || undefined);
-  const { data: stats, isLoading: statsLoading } = useStats(selectedBranchId || undefined);
-
-  return (
-    <Layout>
+  const {
+    selectedBranch,
+    selectedBranchId
+  } = useBranch();
+  const {
+    data: featuredCollections,
+    isLoading: collectionsLoading
+  } = useFeaturedCollections(selectedBranchId || undefined);
+  const {
+    data: stats,
+    isLoading: statsLoading
+  } = useStats(selectedBranchId || undefined);
+  return <Layout>
       {/* Hero Section - Premium Mobile-First Design */}
       <section className="relative min-h-[100svh] flex items-center overflow-hidden pt-20 pb-12 md:pt-0 md:pb-0">
         {/* Animated Background */}
@@ -22,8 +28,12 @@ const Index = () => {
         <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full bg-gradient-to-tr from-primary/10 to-transparent blur-3xl -translate-x-1/3 translate-y-1/3" />
         
         {/* Floating elements - hidden on mobile */}
-        <div className="absolute top-1/4 left-[10%] w-20 h-20 rounded-2xl bg-accent/10 rotate-12 hidden lg:block animate-fade-in" style={{ animationDelay: '600ms' }} />
-        <div className="absolute bottom-1/4 right-[15%] w-16 h-16 rounded-full bg-primary/10 hidden lg:block animate-fade-in" style={{ animationDelay: '800ms' }} />
+        <div className="absolute top-1/4 left-[10%] w-20 h-20 rounded-2xl bg-accent/10 rotate-12 hidden lg:block animate-fade-in" style={{
+        animationDelay: '600ms'
+      }} />
+        <div className="absolute bottom-1/4 right-[15%] w-16 h-16 rounded-full bg-primary/10 hidden lg:block animate-fade-in" style={{
+        animationDelay: '800ms'
+      }} />
         
         <div className="container relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
@@ -67,52 +77,41 @@ const Index = () => {
 
               {/* Quick stats for mobile */}
               <div className="flex justify-center lg:justify-start gap-8 mt-10 pt-10 border-t border-border lg:hidden">
-                {[
-                  { value: stats?.photos ?? '—', label: 'Photos' },
-                  { value: stats?.collections ?? '—', label: 'Collections' },
-                  { value: stats?.branches ?? '—', label: 'Branches' },
-                ].map((stat, i) => (
-                  <div key={i} className="text-center">
+                {[{
+                value: stats?.photos ?? '—',
+                label: 'Photos'
+              }, {
+                value: stats?.collections ?? '—',
+                label: 'Collections'
+              }, {
+                value: stats?.branches ?? '—',
+                label: 'Branches'
+              }].map((stat, i) => <div key={i} className="text-center">
                     <p className="font-display text-2xl font-bold text-primary">{stat.value}</p>
                     <p className="text-xs text-muted-foreground">{stat.label}</p>
-                  </div>
-                ))}
+                  </div>)}
               </div>
             </div>
 
             {/* Right - Hero Image Grid - Desktop only */}
-            <div className="relative animate-fade-in hidden lg:block" style={{ animationDelay: '200ms' }}>
+            <div className="relative animate-fade-in hidden lg:block" style={{
+            animationDelay: '200ms'
+          }}>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-4">
                   <div className="rounded-2xl overflow-hidden shadow-elegant-lg bg-secondary aspect-[3/4] card-hover">
-                    <img
-                      src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=600"
-                      alt="Students celebrating"
-                      className="w-full h-full object-cover"
-                    />
+                    <img alt="Students celebrating" className="w-full h-full object-cover border-0" src="/lovable-uploads/88b8bfee-523d-449c-b3b8-8535cca477d6.jpg" />
                   </div>
                   <div className="rounded-2xl overflow-hidden shadow-elegant-lg bg-secondary aspect-square card-hover">
-                    <img
-                      src="https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?q=80&w=400"
-                      alt="Graduation"
-                      className="w-full h-full object-cover"
-                    />
+                    <img src="https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?q=80&w=400" alt="Graduation" className="w-full h-full object-cover" />
                   </div>
                 </div>
                 <div className="space-y-4 pt-8">
                   <div className="rounded-2xl overflow-hidden shadow-elegant-lg bg-secondary aspect-square card-hover">
-                    <img
-                      src="https://images.unsplash.com/photo-1529390079861-591f6a8ed8d5?q=80&w=400"
-                      alt="School Event"
-                      className="w-full h-full object-cover"
-                    />
+                    <img src="https://images.unsplash.com/photo-1529390079861-591f6a8ed8d5?q=80&w=400" alt="School Event" className="w-full h-full object-cover" />
                   </div>
                   <div className="rounded-2xl overflow-hidden shadow-elegant-lg bg-secondary aspect-[3/4] card-hover">
-                    <img
-                      src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=600"
-                      alt="Campus Life"
-                      className="w-full h-full object-cover"
-                    />
+                    <img src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=600" alt="Campus Life" className="w-full h-full object-cover" />
                   </div>
                 </div>
               </div>
@@ -143,11 +142,7 @@ const Index = () => {
             {/* Left - Image */}
             <div className="relative animate-fade-in order-2 lg:order-1">
               <div className="relative rounded-3xl overflow-hidden shadow-elegant-lg bg-secondary aspect-[4/5]">
-                <img
-                  src="https://images.unsplash.com/photo-1546410531-bb4caa6b424d?q=80&w=800"
-                  alt="School Memories"
-                  className="w-full h-full object-cover"
-                />
+                <img src="https://images.unsplash.com/photo-1546410531-bb4caa6b424d?q=80&w=800" alt="School Memories" className="w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-primary/30 via-transparent to-transparent" />
               </div>
               
@@ -160,7 +155,9 @@ const Index = () => {
             </div>
 
             {/* Right - Content */}
-            <div className="order-1 lg:order-2 animate-fade-in" style={{ animationDelay: '200ms' }}>
+            <div className="order-1 lg:order-2 animate-fade-in" style={{
+            animationDelay: '200ms'
+          }}>
               <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium tracking-wide mb-6">
                 About {selectedBranch?.name || 'NCS Memories'}
               </span>
@@ -227,50 +224,33 @@ const Index = () => {
 
           {/* Collections grid - Better mobile layout */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-8">
-            {collectionsLoading ? (
-              Array.from({ length: 3 }, (_, i) => (
-                <Skeleton key={i} className="aspect-[4/3] rounded-2xl" />
-              ))
-            ) : featuredCollections && featuredCollections.length > 0 ? (
-              featuredCollections.slice(0, 6).map((collection, i) => (
-                <Link
-                  key={collection.id}
-                  to={`/collection/${collection.id}`}
-                  className={`group relative rounded-2xl bg-secondary overflow-hidden shadow-elegant hover:shadow-elegant-lg transition-all duration-300 animate-fade-in stagger-${i + 1}`}
-                  style={{ aspectRatio: i === 0 ? '4/5' : '4/3' }}
-                >
-                  {collection.cover_image_url ? (
-                    <img
-                      src={collection.cover_image_url}
-                      alt={collection.title}
-                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  ) : (
-                    <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary/20 to-accent/20">
+            {collectionsLoading ? Array.from({
+            length: 3
+          }, (_, i) => <Skeleton key={i} className="aspect-[4/3] rounded-2xl" />) : featuredCollections && featuredCollections.length > 0 ? featuredCollections.slice(0, 6).map((collection, i) => <Link key={collection.id} to={`/collection/${collection.id}`} className={`group relative rounded-2xl bg-secondary overflow-hidden shadow-elegant hover:shadow-elegant-lg transition-all duration-300 animate-fade-in stagger-${i + 1}`} style={{
+            aspectRatio: i === 0 ? '4/5' : '4/3'
+          }}>
+                  {collection.cover_image_url ? <img src={collection.cover_image_url} alt={collection.title} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" /> : <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary/20 to-accent/20">
                       <Camera className="h-16 w-16 text-muted-foreground/30" />
-                    </div>
-                  )}
+                    </div>}
                   <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/40 to-transparent" />
                   <div className="absolute bottom-0 left-0 right-0 p-5 md:p-6">
-                    {collection.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mb-3">
-                        {collection.tags.slice(0, 2).map((tag) => (
-                          <span
-                            key={tag.id}
-                            className="inline-block px-3 py-1 text-xs font-semibold rounded-full backdrop-blur-sm"
-                            style={{ backgroundColor: `${tag.color}cc`, color: '#fff' }}
-                          >
+                    {collection.tags.length > 0 && <div className="flex flex-wrap gap-2 mb-3">
+                        {collection.tags.slice(0, 2).map(tag => <span key={tag.id} className="inline-block px-3 py-1 text-xs font-semibold rounded-full backdrop-blur-sm" style={{
+                  backgroundColor: `${tag.color}cc`,
+                  color: '#fff'
+                }}>
                             {tag.name}
-                          </span>
-                        ))}
-                      </div>
-                    )}
+                          </span>)}
+                      </div>}
                     <h3 className="font-display text-lg md:text-2xl font-semibold text-white mb-1">
                       {collection.title}
                     </h3>
                     <p className="text-white/70 text-sm">
                       {collection.photo_count} photos
-                      {collection.event_date && ` • ${new Date(collection.event_date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}`}
+                      {collection.event_date && ` • ${new Date(collection.event_date).toLocaleDateString('en-US', {
+                  month: 'short',
+                  year: 'numeric'
+                })}`}
                     </p>
                   </div>
                   
@@ -278,17 +258,13 @@ const Index = () => {
                   <div className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                     <Play className="h-5 w-5 text-white fill-white" />
                   </div>
-                </Link>
-              ))
-            ) : (
-              <div className="col-span-full text-center py-16 bg-card rounded-2xl border border-border">
+                </Link>) : <div className="col-span-full text-center py-16 bg-card rounded-2xl border border-border">
                 <Camera className="h-16 w-16 mx-auto text-muted-foreground/30 mb-4" />
                 <p className="text-lg text-muted-foreground">No featured collections yet.</p>
                 <p className="text-sm text-muted-foreground/70 mt-1">
                   Add collections and mark them as featured in the admin dashboard.
                 </p>
-              </div>
-            )}
+              </div>}
           </div>
 
           <div className="text-center mt-10 md:mt-12">
@@ -309,23 +285,24 @@ const Index = () => {
       <section className="py-12 md:py-16 bg-primary text-primary-foreground">
         <div className="container">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-12">
-            {[
-              { value: stats?.photos ?? '—', label: 'Photos Preserved' },
-              { value: stats?.collections ?? '—', label: 'Collections' },
-              { value: stats?.events ?? '—', label: 'Event Types' },
-              { value: stats?.branches ?? '—', label: 'Branches' },
-            ].map((stat, i) => (
-              <div key={i} className="text-center">
-                {statsLoading ? (
-                  <Skeleton className="h-10 md:h-12 w-16 md:w-20 mx-auto mb-2 bg-primary-foreground/20" />
-                ) : (
-                  <p className="font-display text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight">
+            {[{
+            value: stats?.photos ?? '—',
+            label: 'Photos Preserved'
+          }, {
+            value: stats?.collections ?? '—',
+            label: 'Collections'
+          }, {
+            value: stats?.events ?? '—',
+            label: 'Event Types'
+          }, {
+            value: stats?.branches ?? '—',
+            label: 'Branches'
+          }].map((stat, i) => <div key={i} className="text-center">
+                {statsLoading ? <Skeleton className="h-10 md:h-12 w-16 md:w-20 mx-auto mb-2 bg-primary-foreground/20" /> : <p className="font-display text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight">
                     {stat.value}
-                  </p>
-                )}
+                  </p>}
                 <p className="text-primary-foreground/70 mt-1 md:mt-2 text-xs md:text-base">{stat.label}</p>
-              </div>
-            ))}
+              </div>)}
           </div>
         </div>
       </section>
@@ -358,8 +335,6 @@ const Index = () => {
           </div>
         </div>
       </section>
-    </Layout>
-  );
+    </Layout>;
 };
-
 export default Index;
