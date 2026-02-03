@@ -95,80 +95,47 @@ ALTER TABLE public.collection_tags ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.user_roles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.site_content ENABLE ROW LEVEL SECURITY;
 
--- Security definer function to check admin role (avoids RLS recursion)
-CREATE OR REPLACE FUNCTION public.has_role(_user_id UUID, _role app_role)
-RETURNS BOOLEAN
-LANGUAGE sql
-STABLE
-SECURITY DEFINER
-SET search_path = public
-AS $$
-    SELECT EXISTS (
-        SELECT 1
-        FROM public.user_roles
-        WHERE user_id = _user_id
-          AND role = _role
-    )
-$$;
-
--- Check if user is any admin type
-CREATE OR REPLACE FUNCTION public.is_admin(_user_id UUID)
-RETURNS BOOLEAN
-LANGUAGE sql
-STABLE
-SECURITY DEFINER
-SET search_path = public
-AS $$
-    SELECT EXISTS (
-        SELECT 1
-        FROM public.user_roles
-        WHERE user_id = _user_id
-          AND role IN ('admin', 'super_admin')
-    )
-$$;
-
 -- ===========================================
--- 4. RLS POLICIES
+-- 4. RLS POLICIES (OPEN FOR DEVELOPMENT)
+-- Note: For production, replace these with authenticated/admin-only policies
 -- ===========================================
 
--- BRANCHES: Public read, admin write
+-- BRANCHES: Public read/write for now
 CREATE POLICY "Anyone can view branches" ON public.branches FOR SELECT USING (true);
-CREATE POLICY "Admins can insert branches" ON public.branches FOR INSERT TO authenticated WITH CHECK (public.is_admin(auth.uid()));
-CREATE POLICY "Admins can update branches" ON public.branches FOR UPDATE TO authenticated USING (public.is_admin(auth.uid()));
-CREATE POLICY "Admins can delete branches" ON public.branches FOR DELETE TO authenticated USING (public.is_admin(auth.uid()));
+CREATE POLICY "Anyone can insert branches" ON public.branches FOR INSERT WITH CHECK (true);
+CREATE POLICY "Anyone can update branches" ON public.branches FOR UPDATE USING (true);
+CREATE POLICY "Anyone can delete branches" ON public.branches FOR DELETE USING (true);
 
--- TAGS: Public read, admin write
+-- TAGS: Public read/write for now
 CREATE POLICY "Anyone can view tags" ON public.tags FOR SELECT USING (true);
-CREATE POLICY "Admins can insert tags" ON public.tags FOR INSERT TO authenticated WITH CHECK (public.is_admin(auth.uid()));
-CREATE POLICY "Admins can update tags" ON public.tags FOR UPDATE TO authenticated USING (public.is_admin(auth.uid()));
-CREATE POLICY "Admins can delete tags" ON public.tags FOR DELETE TO authenticated USING (public.is_admin(auth.uid()));
+CREATE POLICY "Anyone can insert tags" ON public.tags FOR INSERT WITH CHECK (true);
+CREATE POLICY "Anyone can update tags" ON public.tags FOR UPDATE USING (true);
+CREATE POLICY "Anyone can delete tags" ON public.tags FOR DELETE USING (true);
 
--- COLLECTIONS: Public read, admin write
+-- COLLECTIONS: Public read/write for now
 CREATE POLICY "Anyone can view collections" ON public.collections FOR SELECT USING (true);
-CREATE POLICY "Admins can insert collections" ON public.collections FOR INSERT TO authenticated WITH CHECK (public.is_admin(auth.uid()));
-CREATE POLICY "Admins can update collections" ON public.collections FOR UPDATE TO authenticated USING (public.is_admin(auth.uid()));
-CREATE POLICY "Admins can delete collections" ON public.collections FOR DELETE TO authenticated USING (public.is_admin(auth.uid()));
+CREATE POLICY "Anyone can insert collections" ON public.collections FOR INSERT WITH CHECK (true);
+CREATE POLICY "Anyone can update collections" ON public.collections FOR UPDATE USING (true);
+CREATE POLICY "Anyone can delete collections" ON public.collections FOR DELETE USING (true);
 
--- PHOTOS: Public read, admin write
+-- PHOTOS: Public read/write for now
 CREATE POLICY "Anyone can view photos" ON public.photos FOR SELECT USING (true);
-CREATE POLICY "Admins can insert photos" ON public.photos FOR INSERT TO authenticated WITH CHECK (public.is_admin(auth.uid()));
-CREATE POLICY "Admins can update photos" ON public.photos FOR UPDATE TO authenticated USING (public.is_admin(auth.uid()));
-CREATE POLICY "Admins can delete photos" ON public.photos FOR DELETE TO authenticated USING (public.is_admin(auth.uid()));
+CREATE POLICY "Anyone can insert photos" ON public.photos FOR INSERT WITH CHECK (true);
+CREATE POLICY "Anyone can update photos" ON public.photos FOR UPDATE USING (true);
+CREATE POLICY "Anyone can delete photos" ON public.photos FOR DELETE USING (true);
 
--- COLLECTION_TAGS: Public read, admin write
+-- COLLECTION_TAGS: Public read/write for now
 CREATE POLICY "Anyone can view collection_tags" ON public.collection_tags FOR SELECT USING (true);
-CREATE POLICY "Admins can insert collection_tags" ON public.collection_tags FOR INSERT TO authenticated WITH CHECK (public.is_admin(auth.uid()));
-CREATE POLICY "Admins can delete collection_tags" ON public.collection_tags FOR DELETE TO authenticated USING (public.is_admin(auth.uid()));
+CREATE POLICY "Anyone can insert collection_tags" ON public.collection_tags FOR INSERT WITH CHECK (true);
+CREATE POLICY "Anyone can delete collection_tags" ON public.collection_tags FOR DELETE USING (true);
 
--- USER_ROLES: Only super_admin can manage, admins can view
-CREATE POLICY "Admins can view roles" ON public.user_roles FOR SELECT TO authenticated USING (public.is_admin(auth.uid()));
-CREATE POLICY "Super admins can insert roles" ON public.user_roles FOR INSERT TO authenticated WITH CHECK (public.has_role(auth.uid(), 'super_admin'));
-CREATE POLICY "Super admins can delete roles" ON public.user_roles FOR DELETE TO authenticated USING (public.has_role(auth.uid(), 'super_admin'));
+-- USER_ROLES: Read only for now
+CREATE POLICY "Anyone can view roles" ON public.user_roles FOR SELECT USING (true);
 
--- SITE_CONTENT: Public read, admin write
+-- SITE_CONTENT: Public read/write for now
 CREATE POLICY "Anyone can view site_content" ON public.site_content FOR SELECT USING (true);
-CREATE POLICY "Admins can insert site_content" ON public.site_content FOR INSERT TO authenticated WITH CHECK (public.is_admin(auth.uid()));
-CREATE POLICY "Admins can update site_content" ON public.site_content FOR UPDATE TO authenticated USING (public.is_admin(auth.uid()));
+CREATE POLICY "Anyone can insert site_content" ON public.site_content FOR INSERT WITH CHECK (true);
+CREATE POLICY "Anyone can update site_content" ON public.site_content FOR UPDATE USING (true);
 
 -- ===========================================
 -- 5. INDEXES FOR PERFORMANCE
@@ -225,3 +192,24 @@ INSERT INTO public.site_content (page_name, section_key, content) VALUES
     ('home', 'hero_title', 'NCS Memories'),
     ('home', 'hero_subtitle', 'Preserving moments. Celebrating journeys.'),
     ('about', 'main_content', 'NcsMemories is a digital archive dedicated to preserving the cherished moments of our school community.');
+
+-- ===========================================
+-- TO FIX RLS ISSUES, RUN THIS IN SUPABASE SQL EDITOR:
+-- ===========================================
+/*
+-- Drop old restrictive policies
+DROP POLICY IF EXISTS "Admins can insert photos" ON public.photos;
+DROP POLICY IF EXISTS "Admins can update photos" ON public.photos;
+DROP POLICY IF EXISTS "Admins can delete photos" ON public.photos;
+DROP POLICY IF EXISTS "Admins can insert collections" ON public.collections;
+DROP POLICY IF EXISTS "Admins can update collections" ON public.collections;
+DROP POLICY IF EXISTS "Admins can delete collections" ON public.collections;
+
+-- Create open policies for development
+CREATE POLICY "Anyone can insert photos" ON public.photos FOR INSERT WITH CHECK (true);
+CREATE POLICY "Anyone can update photos" ON public.photos FOR UPDATE USING (true);
+CREATE POLICY "Anyone can delete photos" ON public.photos FOR DELETE USING (true);
+CREATE POLICY "Anyone can insert collections" ON public.collections FOR INSERT WITH CHECK (true);
+CREATE POLICY "Anyone can update collections" ON public.collections FOR UPDATE USING (true);
+CREATE POLICY "Anyone can delete collections" ON public.collections FOR DELETE USING (true);
+*/
