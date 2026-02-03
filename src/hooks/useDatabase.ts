@@ -225,3 +225,46 @@ export function useStats(branchId?: string) {
     },
   });
 }
+
+// Fetch all photos for gallery (with optional branch filter)
+export function useAllPhotos(branchId?: string, limit?: number) {
+  return useQuery({
+    queryKey: ['all_photos', branchId, limit],
+    queryFn: async () => {
+      // First get collection IDs for the branch filter
+      let collectionIds: string[] = [];
+      
+      if (branchId) {
+        const { data: collections } = await supabase
+          .from('collections')
+          .select('id')
+          .eq('branch_id', branchId);
+        collectionIds = collections?.map(c => c.id) || [];
+        
+        if (collectionIds.length === 0) return [];
+      }
+      
+      // Fetch photos with collection info
+      let query = supabase
+        .from('photos')
+        .select(`
+          *,
+          collection:collections(id, title, branch_id)
+        `)
+        .order('created_at', { ascending: false });
+      
+      if (branchId && collectionIds.length > 0) {
+        query = query.in('collection_id', collectionIds);
+      }
+      
+      if (limit) {
+        query = query.limit(limit);
+      }
+      
+      const { data, error } = await query;
+      
+      if (error) throw error;
+      return data as (Photo & { collection: { id: string; title: string; branch_id: string } | null })[];
+    },
+  });
+}

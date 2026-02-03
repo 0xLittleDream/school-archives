@@ -1,38 +1,23 @@
-import { usePhotos, useCollections } from '@/hooks/useDatabase';
+import { useAllPhotos } from '@/hooks/useDatabase';
 import { useBranch } from '@/contexts/BranchContext';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Camera, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { useState, useEffect } from 'react';
 
 export function ImageGallerySection() {
   const { selectedBranchId } = useBranch();
-  const { data: collections } = useCollections(selectedBranchId || undefined);
-  const [allPhotos, setAllPhotos] = useState<Array<{ url: string; caption?: string; collectionId: string }>>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: photos, isLoading } = useAllPhotos(selectedBranchId || undefined, 24);
 
-  // Collect photos from collections with cover images
-  useEffect(() => {
-    if (collections && collections.length > 0) {
-      const photos = collections
-        .filter(c => c.cover_image_url)
-        .map(c => ({
-          url: c.cover_image_url!,
-          caption: c.title,
-          collectionId: c.id,
-        }))
-        .slice(0, 12);
-      
-      setAllPhotos(photos);
-      setLoading(false);
-    } else {
-      setLoading(false);
-    }
-  }, [collections]);
+  // Transform photos for display
+  const displayPhotos = photos?.map(photo => ({
+    url: photo.image_url,
+    caption: photo.caption || photo.collection?.title || 'Photo',
+    collectionId: photo.collection_id,
+  })) || [];
 
-  // If no photos, show placeholder gallery
-  const displayPhotos = allPhotos.length > 0 ? allPhotos : [
+  // Fallback placeholder gallery if no photos
+  const placeholderPhotos = [
     { url: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=400', caption: 'Students', collectionId: '' },
     { url: 'https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?q=80&w=400', caption: 'Graduation', collectionId: '' },
     { url: 'https://images.unsplash.com/photo-1529390079861-591f6a8ed8d5?q=80&w=400', caption: 'Event', collectionId: '' },
@@ -40,6 +25,13 @@ export function ImageGallerySection() {
     { url: 'https://images.unsplash.com/photo-1546410531-bb4caa6b424d?q=80&w=400', caption: 'Memories', collectionId: '' },
     { url: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=400', caption: 'Cultural', collectionId: '' },
   ];
+
+  const photosToShow = displayPhotos.length > 0 ? displayPhotos : placeholderPhotos;
+  
+  // Split photos for two rows
+  const halfLength = Math.ceil(photosToShow.length / 2);
+  const row1Photos = photosToShow.slice(0, halfLength);
+  const row2Photos = photosToShow.slice(halfLength);
 
   return (
     <section className="py-16 md:py-24 bg-card overflow-hidden">
@@ -69,14 +61,14 @@ export function ImageGallerySection() {
       {/* Scrolling Gallery Row 1 */}
       <div className="relative mb-4">
         <div className="flex gap-4 animate-scroll-left">
-          {[...displayPhotos, ...displayPhotos].map((photo, i) => (
+          {[...row1Photos, ...row1Photos].map((photo, i) => (
             <Link
               key={i}
               to={photo.collectionId ? `/collection/${photo.collectionId}` : '/memories'}
               className="flex-shrink-0 group"
             >
               <div className="relative w-64 h-44 md:w-80 md:h-52 rounded-2xl overflow-hidden shadow-elegant hover:shadow-elegant-lg transition-all duration-300">
-                {loading ? (
+                {isLoading ? (
                   <Skeleton className="w-full h-full" />
                 ) : (
                   <>
@@ -102,14 +94,14 @@ export function ImageGallerySection() {
       {/* Scrolling Gallery Row 2 - Reverse direction */}
       <div className="relative">
         <div className="flex gap-4 animate-scroll-right">
-          {[...displayPhotos.slice().reverse(), ...displayPhotos.slice().reverse()].map((photo, i) => (
+          {[...row2Photos, ...row2Photos].map((photo, i) => (
             <Link
               key={i}
               to={photo.collectionId ? `/collection/${photo.collectionId}` : '/memories'}
               className="flex-shrink-0 group"
             >
               <div className="relative w-52 h-36 md:w-72 md:h-44 rounded-2xl overflow-hidden shadow-elegant hover:shadow-elegant-lg transition-all duration-300">
-                {loading ? (
+                {isLoading ? (
                   <Skeleton className="w-full h-full" />
                 ) : (
                   <>
