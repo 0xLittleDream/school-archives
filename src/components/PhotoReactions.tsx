@@ -6,11 +6,13 @@ interface PhotoReactionsProps {
   className?: string;
 }
 
-type AllowedReaction = 'heart' | 'cry';
+type AllowedReaction = 'heart' | 'cry' | 'party' | 'anchor';
 
 const REACTIONS: { type: AllowedReaction; emoji: string; label: string }[] = [
   { type: 'heart', emoji: '❤️', label: 'Love' },
   { type: 'cry', emoji: '🥹', label: 'Touched' },
+  { type: 'party', emoji: '🎉', label: 'Celebrate' },
+  { type: 'anchor', emoji: '⚓', label: 'Navy Pride' },
 ];
 
 const STORAGE_KEY = 'photo_reactions';
@@ -24,6 +26,8 @@ interface StoredCounts {
   [photoId: string]: {
     heart: number;
     cry: number;
+    party: number;
+    anchor: number;
   };
 }
 
@@ -63,13 +67,13 @@ function setStoredCounts(counts: StoredCounts) {
 
 export function PhotoReactions({ photoId, className }: PhotoReactionsProps) {
   const [userReactions, setUserReactions] = useState<AllowedReaction[]>([]);
-  const [counts, setCounts] = useState<{ heart: number; cry: number }>({ heart: 0, cry: 0 });
+  const [counts, setCounts] = useState<{ heart: number; cry: number; party: number; anchor: number }>({ heart: 0, cry: 0, party: 0, anchor: 0 });
 
   useEffect(() => {
     const storedReactions = getStoredReactions();
     const storedCounts = getStoredCounts();
     setUserReactions(storedReactions[photoId] || []);
-    setCounts(storedCounts[photoId] || { heart: 0, cry: 0 });
+    setCounts(storedCounts[photoId] || { heart: 0, cry: 0, party: 0, anchor: 0 });
   }, [photoId]);
 
   const hasUserReacted = (type: AllowedReaction) => userReactions.includes(type);
@@ -78,7 +82,7 @@ export function PhotoReactions({ photoId, className }: PhotoReactionsProps) {
     const storedReactions = getStoredReactions();
     const storedCounts = getStoredCounts();
     const currentReactions = storedReactions[photoId] || [];
-    const currentCounts = storedCounts[photoId] || { heart: 0, cry: 0 };
+    const currentCounts = storedCounts[photoId] || { heart: 0, cry: 0, party: 0, anchor: 0 };
     
     let newReactions: AllowedReaction[];
     let newCounts = { ...currentCounts };
