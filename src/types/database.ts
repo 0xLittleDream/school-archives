@@ -42,8 +42,19 @@ export interface Photo {
   created_at: string;
 }
 
-// Content Block Types (reserved for future use)
-export type ContentBlockType = 'image' | 'image_text' | 'text' | 'gallery';
+// Content Block Types - Simple for teachers
+export type ContentBlockType = 'text' | 'image_text';
+
+export interface ContentBlock {
+  id: string;
+  collection_id: string;
+  block_type: ContentBlockType;
+  title: string | null;
+  content: string | null;
+  image_url: string | null;
+  sort_order: number;
+  created_at: string;
+}
 
 // Event Types (for dynamic events)
 export interface Event {
