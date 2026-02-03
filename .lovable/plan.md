@@ -1,203 +1,371 @@
 
-
-# NcsMemories - Implementation Plan
+# Custom Page Builder for Teachers
 
 ## Overview
-A premium digital archive platform for school memories, featuring a polished public website and a secure admin dashboard. Multi-branch support with flexible tagging, real authentication, and full content management.
+
+This plan implements a structured page builder that allows teachers to create beautiful, consistent event pages (Farewell, Annual Day, Assemblies) without any coding knowledge. The system uses predefined templates and section blocks to maintain design quality while giving teachers full content control.
 
 ---
 
-## Phase 1: Foundation & Design System
+## Architecture
 
-### Brand Identity
-- **Primary color palette**: Navy Blue/Royal Blue (#1a365d, #2563eb) with white/light grey backgrounds
-- **Typography**: Elegant serif for headings (Playfair Display), clean sans-serif for body (Inter)
-- **Design tokens**: Large spacing, soft shadows, rounded cards, premium feel
-- **Mobile-first responsive approach throughout
-
-### Core Layout Components
-- Site header with logo "NcsMemories" and navigation
-- Footer with creator credit: "Website created solely by @dr3am8r" (linked to Instagram)
-- Consistent card components for collections
-- Loading states and empty states
-
----
-
-## Phase 2: Database & Backend Setup (Lovable Cloud)
-
-### Database Tables
-1. **branches** - School branches (name, code like "104", location, logo)
-2. **collections** - Memory collections (title, description, cover image, date, branch, photo count)
-3. **photos** - Individual photos (image URL, caption, collection reference)
-4. **tags** - Flexible tagging system (name, color)
-5. **collection_tags** - Many-to-many relationship
-6. **user_roles** - Admin role management (user_id, role)
-7. **site_content** - Editable page content (page name, section, content)
-
-### Authentication & Roles
-- Email/password authentication
-- Admin role system with invite capability
-- Protected admin routes
-- Session persistence
-
-### File Storage
-- Storage bucket for photo uploads
-- Secure access policies
+```text
++----------------------------------+
+|        Admin Dashboard           |
+|    (Page Editor Tab)             |
++----------------------------------+
+              |
+              v
++----------------------------------+
+|       Custom Pages Table         |
+|  (new: custom_pages)             |
+|  - page_type (template)          |
+|  - slug (/farewell-2025)         |
+|  - branch_id                     |
+|  - is_published                  |
++----------------------------------+
+              |
+              v
++----------------------------------+
+|       Page Sections Table        |
+|  (new: page_sections)            |
+|  - section_type (hero, info...)  |
+|  - structured JSON content       |
+|  - sort_order                    |
++----------------------------------+
+              |
+              v
++----------------------------------+
+|    Dynamic Page Renderer         |
+|  /page/:slug or dedicated routes |
++----------------------------------+
+```
 
 ---
 
-## Phase 3: Branch Selection System
+## Database Changes
 
-### First-Time Visitor Experience
-- Modal/fullscreen overlay on first visit
-- "Welcome to NcsMemories - Select Your School" message
-- Visual cards for each branch with logo and name
-- Selection stored in local storage for persistence
+### New Table: `custom_pages`
 
-### Branch Switching
-- Indicator in header showing current branch
-- Easy switch option accessible throughout the site
-- All content filters automatically by selected branch
+| Column | Type | Description |
+|--------|------|-------------|
+| id | UUID | Primary key |
+| title | TEXT | Page title (e.g., "Farewell 2025") |
+| slug | TEXT | URL slug (e.g., "farewell-2025") |
+| page_type | TEXT | Template type: 'farewell', 'event', 'assembly', 'generic' |
+| branch_id | UUID | Associated branch (FK) |
+| cover_image_url | TEXT | Hero background image |
+| is_published | BOOLEAN | Whether page is live |
+| meta_description | TEXT | SEO description |
+| created_at | TIMESTAMPTZ | Creation timestamp |
+| updated_at | TIMESTAMPTZ | Last update |
 
----
+### New Table: `page_sections`
 
-## Phase 4: Public Website
-
-### Home Page
-- Hero section: "NCS Memories" title with subtitle "Preserving moments. Celebrating journeys."
-- Two CTA buttons: "Explore Our Collections" and "View Farewell 2025"
-- Featured collections grid (4-6 highlighted collections)
-- Quick stats (total photos, total collections)
-
-### Memories Page
-- Grid-based gallery layout
-- Filter by tags (Farewell, Annual Day, Cultural Events, Sports, etc.)
-- Each collection card shows: cover image, title, date, photo count, tags
-- Smooth hover animations
-
-### Farewell 2025 (Special Section)
-- Dedicated page for current year's farewell content
-- Premium gallery layout with larger featured images
-- Easy navigation through all farewell photos
-
-### Events Page
-- Chronological listing of school events
-- Grouped by year if needed
-- Quick links to related collections
-
-### About Page
-- Editable content section about NcsMemories
-- School network information
-- Mission/purpose of the archive
-
-### Individual Collection View
-- Full gallery grid of all photos in collection
-- Lightbox view for individual photos
-- Collection details (title, date, description, tags)
-- Photo download option (optional)
+| Column | Type | Description |
+|--------|------|-------------|
+| id | UUID | Primary key |
+| page_id | UUID | Parent page (FK) |
+| section_type | TEXT | 'hero', 'info_card', 'text_block', 'gallery', 'stats', 'quote', 'cta' |
+| title | TEXT | Section heading |
+| subtitle | TEXT | Section subheading |
+| content | TEXT | Rich text content |
+| image_url | TEXT | Section image |
+| metadata | JSONB | Section-specific data (stats array, button text, etc.) |
+| sort_order | INTEGER | Display order |
+| created_at | TIMESTAMPTZ | Creation timestamp |
 
 ---
 
-## Phase 5: Admin Dashboard
+## Page Templates
 
-### Admin Authentication
-- Secure login page at /admin
-- Protected routes - redirects non-admins to login
-- Session-based access control
+### 1. Farewell Template
+Pre-configured sections:
+- Hero (with graduation cap badge, title, subtitle, date/location)
+- Message/Quote block
+- Photo Gallery (linked to collection)
+- Stats row (years, memories, batch info)
+- Call-to-action
 
-### Dashboard Home
-- Quick stats overview (total collections, photos, branches)
-- Recent uploads
-- Quick action buttons
+### 2. Event/Annual Day Template
+Pre-configured sections:
+- Hero with event badge
+- Event info cards (date, time, venue)
+- Description blocks
+- Photo Gallery
+- Stats/highlights
 
-### Branch Management
-- View all branches
-- Add new branch (name, code, location, logo upload)
-- Edit existing branches
-- Delete branches (with confirmation)
-
-### Collections Management
-- Table/grid view of all collections
-- Create new collection:
-  - Title, description, date
-  - Select branch
-  - Upload cover image
-  - Assign tags
-- Edit collection details
-- Delete collection (with confirmation)
-- View photo count per collection
-
-### Photo Upload System
-- Select target collection
-- Multi-image upload with drag-and-drop
-- Upload progress indicators
-- Auto-update photo count on collection
-- Preview before upload
-- Bulk delete capability
-
-### Tags Management
-- View all tags
-- Create new tags with custom colors
-- Edit tag names
-- Delete tags
-
-### Admin Management
-- View list of current admins
-- Invite new admin via email
-- Remove admin access
-
-### Page Editor
-- Edit Home page hero text
-- Edit About page content
-- Simple rich text editing
-- Save changes with preview
+### 3. Generic Template
+Flexible blank slate with section picker
 
 ---
 
-## Phase 6: Sample Data & Polish
+## Section Block Types
 
-### Sample Content
-- 3 sample branches (NCS Vizag (104), NCS Hyderabad, NCS Bangalore)
-- Sample tags (Farewell, Annual Day, Cultural Events, Sports, Achievements)
-- 3-4 demo collections with placeholder images
-- Sample photos in each collection
+Each section is a structured component teachers fill in:
 
-### Final Polish
-- Page transitions and animations
-- Loading skeletons
-- Error handling with friendly messages
-- 404 page styling
-- SEO meta tags
-- Favicon and branding
+| Section Type | Editable Fields | Teacher Sees |
+|-------------|-----------------|--------------|
+| **Hero** | Title, Subtitle, Badge text, Background image, Date, Location | Simple form with image upload |
+| **Info Card** | Icon selection, Title, Description | Card with icon picker dropdown |
+| **Text Block** | Heading, Body text, Optional image, Layout (left/right) | WYSIWYG-lite textarea |
+| **Gallery** | Link to collection OR upload images directly | Collection picker or upload |
+| **Stats Row** | 4 stat items (value + label each) | 4 input pairs |
+| **Quote** | Quote text, Attribution | Two text fields |
+| **CTA Button** | Button text, Link URL | Two text fields |
 
 ---
 
-## Navigation Structure
+## Implementation Steps
 
-**Public Site:**
-- Home → /
-- Memories → /memories
-- Farewell 2025 → /farewell-2025
-- Events → /events
-- About → /about
-- Collection Detail → /collection/:id
+### Phase 1: Database & Types
 
-**Admin Dashboard:**
-- Login → /admin/login
-- Dashboard → /admin
-- Branches → /admin/branches
-- Collections → /admin/collections
-- Photos → /admin/photos
-- Tags → /admin/tags
-- Admins → /admin/users
-- Page Editor → /admin/pages
+1. **Create SQL migration** for `custom_pages` and `page_sections` tables with RLS policies
+2. **Update TypeScript types** in `src/types/database.ts`:
+   - Add `CustomPage` interface
+   - Add `PageSection` interface  
+   - Add `PageSectionType` union type
+
+### Phase 2: Data Layer
+
+3. **Create hooks** in `src/hooks/useDatabase.ts`:
+   - `useCustomPages(branchId)` - Fetch all pages for branch
+   - `useCustomPage(slug)` - Fetch single page with sections
+   - `usePageSections(pageId)` - Fetch sections for a page
+
+4. **Create mutations** in `src/hooks/useAdminMutations.ts`:
+   - `useCreateCustomPage()`
+   - `useUpdateCustomPage()`
+   - `useDeleteCustomPage()`
+   - `useCreatePageSection()`
+   - `useUpdatePageSection()`
+   - `useDeletePageSection()`
+   - `useReorderPageSections()`
+
+### Phase 3: Admin UI Components
+
+5. **Create `src/components/admin/page-builder/` directory** with:
+   - `PageBuilderEditor.tsx` - Main page editing interface
+   - `SectionEditor.tsx` - Individual section edit forms
+   - `SectionPicker.tsx` - Add new section modal
+   - `SectionPreview.tsx` - Live preview of section
+   - `TemplatePicker.tsx` - Choose page template on creation
+
+6. **Section Editor Forms** (one per type):
+   - `HeroSectionForm.tsx`
+   - `TextBlockForm.tsx`
+   - `GallerySectionForm.tsx`
+   - `StatsSectionForm.tsx`
+   - `QuoteSectionForm.tsx`
+   - `CTASectionForm.tsx`
+
+### Phase 4: Update PageEditor Component
+
+7. **Refactor `src/components/admin/PageEditor.tsx`**:
+   - Add "Create New Page" button with template picker
+   - List existing custom pages with edit/delete/preview
+   - Navigate to PageBuilderEditor for editing
+
+### Phase 5: Public Rendering
+
+8. **Create `src/pages/CustomPage.tsx`**:
+   - Dynamic page renderer
+   - Fetches page by slug
+   - Renders sections using appropriate components
+
+9. **Create `src/components/page-sections/` directory** with render components:
+   - `HeroSection.tsx`
+   - `TextBlockSection.tsx`
+   - `GallerySection.tsx`
+   - `StatsSection.tsx`
+   - `QuoteSection.tsx`
+   - `CTASection.tsx`
+
+### Phase 6: Routing
+
+10. **Update `src/App.tsx`**:
+    - Add route: `/page/:slug` for custom pages
+    - Keep existing `/farewell-2025` route but make it load from custom pages
 
 ---
 
-## Key User Flows
+## UI/UX Design for Teachers
 
-1. **First Visit**: Visitor lands → Branch selection modal → Home page (filtered to branch)
-2. **Browse Memories**: Home → Memories → Filter by tag → Click collection → View photos in lightbox
-3. **Admin Upload**: Login → Dashboard → Collections → Create/Select collection → Upload photos
-4. **Manage Branches**: Admin → Branches → Add new branch → Save → Appears in public selector
+### Page List View (Admin → Page Editor)
+```text
++------------------------------------------+
+|  Your Event Pages                         |
++------------------------------------------+
+| [+ Create New Page]                       |
+|                                           |
+| ┌─────────────────────────────────────┐  |
+| │ 🎓 Farewell 2025                    │  |
+| │ NCS Vizag • Published               │  |
+| │ [Edit] [Preview] [Unpublish]        │  |
+| └─────────────────────────────────────┘  |
+|                                           |
+| ┌─────────────────────────────────────┐  |
+| │ 🎭 Annual Day 2025                  │  |
+| │ NCS Vizag • Draft                   │  |
+| │ [Edit] [Preview] [Publish]          │  |
+| └─────────────────────────────────────┘  |
++------------------------------------------+
+```
 
+### Page Builder View
+```text
++------------------------------------------+
+| ← Back    Farewell 2025    [Preview] [Save]|
++------------------------------------------+
+| Page Settings                             |
+| Title: [Farewell 2025        ]           |
+| URL: /page/[farewell-2025    ]           |
+| Branch: [NCS Vizag ▼]                    |
++------------------------------------------+
+| Sections                    [+ Add Section]|
++------------------------------------------+
+| ≡ 1. Hero Section           [Edit] [×]   |
+|   "Farewell 2025 - Class of..."          |
++------------------------------------------+
+| ≡ 2. Quote Section          [Edit] [×]   |
+|   "As you step into a new chapter..."    |
++------------------------------------------+
+| ≡ 3. Gallery Section        [Edit] [×]   |
+|   12 photos from "Farewell Photos"       |
++------------------------------------------+
+| ≡ 4. Stats Section          [Edit] [×]   |
+|   12 Years • 100 Memories • 1 Batch      |
++------------------------------------------+
+```
+
+### Section Editor Modal (Example: Hero)
+```text
++------------------------------------------+
+|  Edit Hero Section                    [×] |
++------------------------------------------+
+| Badge Text:                               |
+| [Class of 2025            ]              |
+|                                           |
+| Main Title:                               |
+| [Farewell                 ]              |
+| [2025                     ]              |
+|                                           |
+| Subtitle:                                 |
+| [Celebrating the journey of our...]      |
+|                                           |
+| Background Image:                         |
+| [📷 Choose Image] or [🖼️ Upload]         |
+|                                           |
+| Event Date:     Event Location:           |
+| [March 2025 ▼]  [NCS Campus      ]       |
+|                                           |
+|           [Cancel]  [Save Section]        |
++------------------------------------------+
+```
+
+---
+
+## Files to Create/Modify
+
+### New Files
+| File Path | Purpose |
+|-----------|---------|
+| `src/types/pageBuilder.ts` | TypeScript types for custom pages |
+| `src/components/admin/page-builder/PageBuilderEditor.tsx` | Main page builder UI |
+| `src/components/admin/page-builder/SectionEditor.tsx` | Section edit modal |
+| `src/components/admin/page-builder/SectionPicker.tsx` | Add section picker |
+| `src/components/admin/page-builder/TemplatePicker.tsx` | Template selection |
+| `src/components/admin/page-builder/sections/*.tsx` | Section-specific forms (6 files) |
+| `src/components/page-sections/*.tsx` | Public render components (6 files) |
+| `src/pages/CustomPage.tsx` | Dynamic page renderer |
+| `src/hooks/usePageBuilder.ts` | Page builder specific hooks |
+
+### Modified Files
+| File Path | Changes |
+|-----------|---------|
+| `supabase/schema.sql` | Add custom_pages and page_sections tables |
+| `src/types/database.ts` | Add new interfaces |
+| `src/hooks/useDatabase.ts` | Add page fetching hooks |
+| `src/hooks/useAdminMutations.ts` | Add page mutation hooks |
+| `src/components/admin/PageEditor.tsx` | Complete rewrite for page management |
+| `src/App.tsx` | Add /page/:slug route |
+| `src/pages/Farewell2025.tsx` | Optionally convert to load from custom pages |
+
+---
+
+## SQL Migration Script
+
+```sql
+-- Custom Pages table
+CREATE TABLE public.custom_pages (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    title TEXT NOT NULL,
+    slug TEXT NOT NULL,
+    page_type TEXT NOT NULL DEFAULT 'generic',
+    branch_id UUID REFERENCES public.branches(id) ON DELETE CASCADE NOT NULL,
+    cover_image_url TEXT,
+    is_published BOOLEAN DEFAULT false,
+    meta_description TEXT,
+    created_at TIMESTAMPTZ DEFAULT now() NOT NULL,
+    updated_at TIMESTAMPTZ DEFAULT now() NOT NULL,
+    UNIQUE (slug, branch_id)
+);
+
+-- Page Sections table
+CREATE TABLE public.page_sections (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    page_id UUID REFERENCES public.custom_pages(id) ON DELETE CASCADE NOT NULL,
+    section_type TEXT NOT NULL,
+    title TEXT,
+    subtitle TEXT,
+    content TEXT,
+    image_url TEXT,
+    metadata JSONB DEFAULT '{}',
+    sort_order INTEGER DEFAULT 0,
+    created_at TIMESTAMPTZ DEFAULT now() NOT NULL
+);
+
+-- Enable RLS
+ALTER TABLE public.custom_pages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.page_sections ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policies (open for development)
+CREATE POLICY "Anyone can view custom_pages" ON public.custom_pages FOR SELECT USING (true);
+CREATE POLICY "Anyone can insert custom_pages" ON public.custom_pages FOR INSERT WITH CHECK (true);
+CREATE POLICY "Anyone can update custom_pages" ON public.custom_pages FOR UPDATE USING (true);
+CREATE POLICY "Anyone can delete custom_pages" ON public.custom_pages FOR DELETE USING (true);
+
+CREATE POLICY "Anyone can view page_sections" ON public.page_sections FOR SELECT USING (true);
+CREATE POLICY "Anyone can insert page_sections" ON public.page_sections FOR INSERT WITH CHECK (true);
+CREATE POLICY "Anyone can update page_sections" ON public.page_sections FOR UPDATE USING (true);
+CREATE POLICY "Anyone can delete page_sections" ON public.page_sections FOR DELETE USING (true);
+
+-- Indexes
+CREATE INDEX idx_custom_pages_branch ON public.custom_pages(branch_id);
+CREATE INDEX idx_custom_pages_slug ON public.custom_pages(slug);
+CREATE INDEX idx_page_sections_page ON public.page_sections(page_id);
+```
+
+---
+
+## Key Constraints Addressed
+
+| Requirement | Solution |
+|-------------|----------|
+| Teachers cannot edit global layout/styles | Section types have fixed layouts; only content is editable |
+| Structured, safe formatting | Each section has predefined fields - no raw HTML/markdown |
+| Design matches Farewell page quality | Render components reuse exact styles from Farewell2025.tsx |
+| Branch-based association | Pages are linked to branch_id; filtered in admin |
+| No coding required | Simple forms with labels, image uploaders, dropdowns |
+| Templates for common pages | Predefined section arrangements for Farewell/Event/Assembly |
+
+---
+
+## Estimated Complexity
+
+- **Database**: 2 new tables, straightforward schema
+- **Components**: ~15 new files, mostly form components
+- **Logic**: Moderate - section ordering, template application
+- **Testing**: Recommend testing page creation → preview → publish flow
+
+This implementation gives teachers a powerful yet controlled page builder that maintains the premium aesthetic of NCS Memories while requiring zero technical knowledge.
