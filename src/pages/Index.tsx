@@ -9,6 +9,7 @@ import { ImageGallerySection } from '@/components/home/ImageGallerySection';
 import schoolMemoriesHero from '@/assets/school-memories-hero.jpg';
 import schoolEvent from '@/assets/school-event.jpg';
 import navyChildrenSchool from '@/assets/navy-children-school.jpg';
+import navyShipVisit from '@/assets/navy-ship-visit.jpg';
 const Index = () => {
   const {
     selectedBranch,
@@ -114,7 +115,7 @@ const Index = () => {
                     <img src={schoolEvent} alt="School Event" className="w-full h-full object-cover" />
                   </div>
                   <div className="rounded-2xl overflow-hidden shadow-elegant-lg bg-secondary aspect-[3/4] card-hover">
-                    <img src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=600" alt="Campus Life" className="w-full h-full object-cover" />
+                    <img src={navyShipVisit} alt="Navy Ship Visit" className="w-full h-full object-cover object-bottom" />
                   </div>
                 </div>
               </div>
