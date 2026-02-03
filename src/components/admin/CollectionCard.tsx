@@ -1,8 +1,12 @@
-import { Camera, Pencil, Trash2, Settings, ExternalLink } from 'lucide-react';
+import { Camera, Pencil, Trash2, Settings, ExternalLink, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import type { CollectionWithTags } from '@/types/database';
 import { format } from 'date-fns';
+import { supabase } from '@/integrations/supabase/client';
+import { useQueryClient } from '@tanstack/react-query';
+import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
 
 interface CollectionCardProps {
   collection: CollectionWithTags;
@@ -12,8 +16,34 @@ interface CollectionCardProps {
 }
 
 export function CollectionCard({ collection, onEdit, onDelete, onEditMetadata }: CollectionCardProps) {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  const toggleFeatured = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      const { error } = await supabase
+        .from('collections')
+        .update({ is_featured: !collection.is_featured })
+        .eq('id', collection.id);
+      
+      if (error) throw error;
+      
+      queryClient.invalidateQueries({ queryKey: ['collections'] });
+      toast({ 
+        title: collection.is_featured ? 'Removed from featured' : '⭐ Added to featured!',
+        description: collection.is_featured ? undefined : 'This collection will now appear on the homepage.'
+      });
+    } catch (error: any) {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    }
+  };
+
   return (
-    <div className="group relative bg-card rounded-2xl overflow-hidden shadow-elegant hover:shadow-elegant-lg transition-all border border-border">
+    <div className={cn(
+      "group relative bg-card rounded-2xl overflow-hidden shadow-elegant hover:shadow-elegant-lg transition-all border-2",
+      collection.is_featured ? "border-accent" : "border-border"
+    )}>
       {/* Cover Image */}
       <div className="relative aspect-[4/3] bg-secondary">
         {collection.cover_image_url ? (
@@ -28,14 +58,19 @@ export function CollectionCard({ collection, onEdit, onDelete, onEditMetadata }:
           </div>
         )}
         
-        {/* Featured Badge */}
-        {collection.is_featured && (
-          <div className="absolute top-3 left-3">
-            <span className="px-3 py-1 text-xs font-semibold rounded-full bg-accent text-accent-foreground">
-              Featured
-            </span>
-          </div>
-        )}
+        {/* Featured Star Button */}
+        <button
+          onClick={toggleFeatured}
+          className={cn(
+            "absolute top-3 left-3 p-2 rounded-full transition-all shadow-lg",
+            collection.is_featured 
+              ? "bg-accent text-accent-foreground" 
+              : "bg-black/40 text-white/80 hover:bg-accent hover:text-accent-foreground"
+          )}
+          title={collection.is_featured ? "Remove from featured" : "Add to featured (homepage)"}
+        >
+          <Star className={cn("h-4 w-4", collection.is_featured && "fill-current")} />
+        </button>
         
         {/* Overlay on hover */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -74,9 +109,14 @@ export function CollectionCard({ collection, onEdit, onDelete, onEditMetadata }:
       <div className="p-5">
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
-            <h3 className="font-display text-lg font-semibold text-foreground line-clamp-1">
-              {collection.title}
-            </h3>
+            <div className="flex items-center gap-2">
+              <h3 className="font-display text-lg font-semibold text-foreground line-clamp-1">
+                {collection.title}
+              </h3>
+              {collection.is_featured && (
+                <span className="text-xs font-semibold text-accent">★ Featured</span>
+              )}
+            </div>
             
             {collection.event_date && (
               <p className="text-sm text-muted-foreground mt-0.5">
