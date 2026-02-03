@@ -1,15 +1,17 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { useCollections, useTags } from '@/hooks/useDatabase';
 import { useBranch } from '@/contexts/BranchContext';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Camera, Filter, Search, Grid3X3, LayoutGrid, Sparkles, Calendar, Play } from 'lucide-react';
+import { Camera, Filter, Search, Grid3X3, LayoutGrid, Sparkles, Play, Calendar } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { YearFilter } from '@/components/YearFilter';
 
 const Memories = () => {
   const { selectedBranch, selectedBranchId } = useBranch();
   const [selectedTagId, setSelectedTagId] = useState<string | null>(null);
+  const [selectedYear, setSelectedYear] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'masonry'>('grid');
   const { data: tags, isLoading: tagsLoading } = useTags();
@@ -18,11 +20,36 @@ const Memories = () => {
     selectedTagId || undefined
   );
 
-  // Filter by search query
-  const filteredCollections = collections?.filter(collection => 
-    collection.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    collection.description?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Extract available years from collections
+  const availableYears = useMemo(() => {
+    if (!collections) return [];
+    const years = new Set<number>();
+    collections.forEach(collection => {
+      if (collection.event_date) {
+        const year = new Date(collection.event_date).getFullYear();
+        years.add(year);
+      }
+    });
+    return Array.from(years).sort((a, b) => b - a);
+  }, [collections]);
+
+  // Filter by search query and year
+  const filteredCollections = useMemo(() => {
+    let filtered = collections?.filter(collection => 
+      collection.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      collection.description?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    
+    if (selectedYear && filtered) {
+      filtered = filtered.filter(collection => {
+        if (!collection.event_date) return false;
+        const eventYear = new Date(collection.event_date).getFullYear();
+        return eventYear.toString() === selectedYear;
+      });
+    }
+    
+    return filtered;
+  }, [collections, searchQuery, selectedYear]);
 
   return (
     <Layout>
@@ -61,25 +88,32 @@ const Memories = () => {
               />
             </div>
 
-            {/* View Toggle */}
-            <div className="flex items-center gap-2 justify-end">
-              <span className="text-sm text-muted-foreground mr-2 hidden sm:inline">View:</span>
-              <button
-                onClick={() => setViewMode('grid')}
-                className={`p-3 rounded-xl transition-colors ${
-                  viewMode === 'grid' ? 'bg-primary text-primary-foreground' : 'bg-secondary hover:bg-secondary/80'
-                }`}
-              >
-                <Grid3X3 className="h-4 w-4" />
-              </button>
-              <button
-                onClick={() => setViewMode('masonry')}
-                className={`p-3 rounded-xl transition-colors ${
-                  viewMode === 'masonry' ? 'bg-primary text-primary-foreground' : 'bg-secondary hover:bg-secondary/80'
-                }`}
-              >
-                <LayoutGrid className="h-4 w-4" />
-              </button>
+            {/* Year Filter + View Toggle */}
+            <div className="flex items-center gap-3 justify-end">
+              <YearFilter 
+                selectedYear={selectedYear}
+                onYearChange={setSelectedYear}
+                availableYears={availableYears}
+              />
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground mr-2 hidden sm:inline">View:</span>
+                <button
+                  onClick={() => setViewMode('grid')}
+                  className={`p-3 rounded-xl transition-colors ${
+                    viewMode === 'grid' ? 'bg-primary text-primary-foreground' : 'bg-secondary hover:bg-secondary/80'
+                  }`}
+                >
+                  <Grid3X3 className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={() => setViewMode('masonry')}
+                  className={`p-3 rounded-xl transition-colors ${
+                    viewMode === 'masonry' ? 'bg-primary text-primary-foreground' : 'bg-secondary hover:bg-secondary/80'
+                  }`}
+                >
+                  <LayoutGrid className="h-4 w-4" />
+                </button>
+              </div>
             </div>
           </div>
         </div>
