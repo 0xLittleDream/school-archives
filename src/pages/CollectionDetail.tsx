@@ -9,7 +9,6 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { ShareButtons } from '@/components/ShareButtons';
 import { PhotoReactions } from '@/components/PhotoReactions';
-import { PhotoComments } from '@/components/PhotoComments';
 
 const CollectionDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -348,10 +347,9 @@ const CollectionDetail = () => {
                     {currentPhotoIndex + 1} of {photos.length}
                   </p>
                   
-                  {/* Reactions and Comments */}
+                  {/* Reactions */}
                   <div className="flex flex-wrap items-center justify-center gap-3">
                     <PhotoReactions photoId={photos[currentPhotoIndex].id} />
-                    <PhotoComments photoId={photos[currentPhotoIndex].id} />
                     <a
                       href={photos[currentPhotoIndex].image_url}
                       download
