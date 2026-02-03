@@ -14,12 +14,13 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { BranchSelector } from './BranchSelector';
+import { ImageUploader } from './ImageUploader';
 import type { CollectionWithTags } from '@/types/database';
 
 const formSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   description: z.string().optional(),
-  cover_image_url: z.string().url('Must be a valid URL').optional().or(z.literal('')),
+  cover_image_url: z.string().optional().or(z.literal('')),
   event_date: z.string().optional(),
   branch_id: z.string().min(1, 'Branch is required'),
   is_featured: z.boolean().default(false),
@@ -54,7 +55,7 @@ export function CollectionForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
         <FormField
           control={form.control}
           name="title"
@@ -92,9 +93,12 @@ export function CollectionForm({
           name="cover_image_url"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Cover Image URL</FormLabel>
+              <FormLabel>Cover Image</FormLabel>
               <FormControl>
-                <Input placeholder="https://example.com/image.jpg" {...field} />
+                <ImageUploader
+                  value={field.value}
+                  onChange={field.onChange}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -139,21 +143,26 @@ export function CollectionForm({
           control={form.control}
           name="is_featured"
           render={({ field }) => (
-            <FormItem className="flex items-center gap-2 space-y-0">
+            <FormItem className="flex items-center gap-3 space-y-0 rounded-lg border border-border p-4 bg-secondary/30">
               <FormControl>
                 <Checkbox
                   checked={field.value}
                   onCheckedChange={field.onChange}
                 />
               </FormControl>
-              <FormLabel className="!mt-0 cursor-pointer">
-                Feature this collection on the homepage
-              </FormLabel>
+              <div>
+                <FormLabel className="!mt-0 cursor-pointer font-medium">
+                  Feature on Homepage
+                </FormLabel>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Display this collection in the featured section
+                </p>
+              </div>
             </FormItem>
           )}
         />
 
-        <div className="flex justify-end gap-3 pt-4">
+        <div className="flex justify-end gap-3 pt-4 border-t border-border">
           <Button type="button" variant="outline" onClick={onCancel}>
             Cancel
           </Button>

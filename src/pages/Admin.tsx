@@ -18,7 +18,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Upload, FolderOpen, FileEdit, Plus } from 'lucide-react';
+import { Upload, FolderOpen, FileEdit, Plus, Settings, Shield } from 'lucide-react';
 import { useCollections } from '@/hooks/useDatabase';
 import {
   useCreateCollection,
@@ -28,6 +28,7 @@ import {
 import { CollectionCard } from '@/components/admin/CollectionCard';
 import { CollectionForm } from '@/components/admin/CollectionForm';
 import { BranchSelector } from '@/components/admin/BranchSelector';
+import { PhotoUploader } from '@/components/admin/PhotoUploader';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import type { CollectionWithTags } from '@/types/database';
@@ -109,59 +110,69 @@ const Admin = () => {
 
   return (
     <Layout>
-      <div className="container py-8">
+      <div className="container py-8 md:py-12">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="font-display text-4xl md:text-5xl font-bold text-primary">
-            Admin Dashboard
-          </h1>
-          <p className="text-muted-foreground mt-2">
-            Manage photos, collections, and page content for NCS Memories
-          </p>
+        <div className="mb-10">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+              <Settings className="h-6 w-6 text-primary" />
+            </div>
+            <div>
+              <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground">
+                Admin Dashboard
+              </h1>
+              <p className="text-muted-foreground">
+                Manage photos, collections, and page content
+              </p>
+            </div>
+          </div>
+
+          {/* RLS Notice */}
+          <div className="mt-4 p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 dark:bg-amber-900/20 dark:border-amber-800 dark:text-amber-200">
+            <div className="flex items-start gap-3">
+              <Shield className="h-5 w-5 flex-shrink-0 mt-0.5" />
+              <div className="text-sm">
+                <p className="font-medium mb-1">Note: Row Level Security</p>
+                <p className="opacity-80">
+                  To create/edit/delete collections, you need to be authenticated as an admin. 
+                  Run the SQL in the Supabase dashboard to add temporary public access or set up proper authentication.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Tabs */}
-        <Tabs defaultValue="collections" className="space-y-6">
-          <TabsList className="bg-secondary/50 p-1">
-            <TabsTrigger value="photos" className="gap-2">
-              <Upload className="h-4 w-4" />
-              Photo Upload
-            </TabsTrigger>
-            <TabsTrigger value="collections" className="gap-2">
+        <Tabs defaultValue="collections" className="space-y-8">
+          <TabsList className="bg-secondary/50 p-1.5 h-auto">
+            <TabsTrigger value="collections" className="gap-2 px-4 py-2.5">
               <FolderOpen className="h-4 w-4" />
               Collections
             </TabsTrigger>
-            <TabsTrigger value="pages" className="gap-2">
+            <TabsTrigger value="photos" className="gap-2 px-4 py-2.5">
+              <Upload className="h-4 w-4" />
+              Photo Upload
+            </TabsTrigger>
+            <TabsTrigger value="pages" className="gap-2 px-4 py-2.5">
               <FileEdit className="h-4 w-4" />
               Page Editor
             </TabsTrigger>
           </TabsList>
 
-          {/* Photo Upload Tab */}
-          <TabsContent value="photos">
-            <div className="bg-card rounded-xl p-8 text-center border border-dashed border-border">
-              <Upload className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
-              <h3 className="font-display text-xl font-semibold mb-2">Photo Upload</h3>
-              <p className="text-muted-foreground">
-                Photo upload functionality coming soon. You'll be able to bulk upload photos to collections.
-              </p>
-            </div>
-          </TabsContent>
-
           {/* Collections Tab */}
           <TabsContent value="collections" className="space-y-6">
             {/* Header Row */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 bg-card rounded-xl border border-border">
               <div>
-                <h2 className="font-display text-2xl font-semibold">Memory Collections</h2>
+                <h2 className="font-display text-2xl font-semibold text-foreground">Memory Collections</h2>
                 <p className="text-muted-foreground text-sm">Create and manage memory collections</p>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-3">
                 <BranchSelector
                   value={selectedBranchId}
                   onValueChange={setSelectedBranchId}
                   placeholder="All branches"
-                  className="w-[200px]"
+                  className="w-[180px]"
                 />
                 <Button
                   onClick={() => {
@@ -192,31 +203,37 @@ const Admin = () => {
                   />
                 ))
               ) : (
-                <div className="col-span-full text-center py-12">
-                  <FolderOpen className="h-12 w-12 mx-auto text-muted-foreground/30 mb-4" />
-                  <p className="text-muted-foreground">No collections found.</p>
+                <div className="col-span-full text-center py-16 bg-card rounded-2xl border border-dashed border-border">
+                  <FolderOpen className="h-16 w-16 mx-auto text-muted-foreground/30 mb-4" />
+                  <h3 className="font-display text-xl font-semibold text-foreground mb-2">No collections yet</h3>
+                  <p className="text-muted-foreground mb-6">Get started by creating your first collection.</p>
                   <Button
-                    variant="outline"
-                    className="mt-4"
                     onClick={() => {
                       setEditingCollection(null);
                       setIsFormOpen(true);
                     }}
+                    className="gap-2"
                   >
-                    Create your first collection
+                    <Plus className="h-4 w-4" />
+                    Create Collection
                   </Button>
                 </div>
               )}
             </div>
           </TabsContent>
 
+          {/* Photo Upload Tab */}
+          <TabsContent value="photos">
+            <PhotoUploader />
+          </TabsContent>
+
           {/* Page Editor Tab */}
           <TabsContent value="pages">
-            <div className="bg-card rounded-xl p-8 text-center border border-dashed border-border">
-              <FileEdit className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
-              <h3 className="font-display text-xl font-semibold mb-2">Page Editor</h3>
-              <p className="text-muted-foreground">
-                Page content editor coming soon. You'll be able to edit hero text, about sections, and more.
+            <div className="bg-card rounded-2xl p-12 text-center border border-dashed border-border">
+              <FileEdit className="h-16 w-16 mx-auto text-muted-foreground/30 mb-4" />
+              <h3 className="font-display text-2xl font-semibold text-foreground mb-2">Page Editor</h3>
+              <p className="text-muted-foreground max-w-md mx-auto">
+                Coming soon. You'll be able to edit hero text, about sections, and other page content.
               </p>
             </div>
           </TabsContent>
