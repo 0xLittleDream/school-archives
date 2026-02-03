@@ -156,19 +156,19 @@
   }
 }
 
-/* Infinite scroll animations */
+/* Infinite scroll animations - seamless loop */
 @keyframes scroll-left {
   0% {
     transform: translateX(0);
   }
   100% {
-    transform: translateX(-50%);
+    transform: translateX(calc(-50% - 8px));
   }
 }
 
 @keyframes scroll-right {
   0% {
-    transform: translateX(-50%);
+    transform: translateX(calc(-50% - 8px));
   }
   100% {
     transform: translateX(0);
@@ -176,11 +176,15 @@
 }
 
 .animate-scroll-left {
-  animation: scroll-left 40s linear infinite;
+  display: flex;
+  width: max-content;
+  animation: scroll-left 30s linear infinite;
 }
 
 .animate-scroll-right {
-  animation: scroll-right 40s linear infinite;
+  display: flex;
+  width: max-content;
+  animation: scroll-right 30s linear infinite;
 }
 
 .animate-scroll-left:hover,
