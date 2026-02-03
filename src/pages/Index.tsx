@@ -13,6 +13,7 @@ import navyShipVisit from '@/assets/navy-ship-visit.jpg';
 import navyDayArt1 from '@/assets/navy-day-art-1.jpg';
 import navyDayArt2 from '@/assets/navy-day-art-2.jpg';
 import schoolDancePerformances from '@/assets/school-dance-performances.jpg';
+import independenceDayCelebrations from '@/assets/independence-day-celebrations.jpg';
 const Index = () => {
   const {
     selectedBranch,
@@ -107,7 +108,7 @@ const Index = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-4">
                   <div className="rounded-2xl overflow-hidden shadow-elegant-lg bg-secondary aspect-[3/4] card-hover">
-                    <img alt="Students celebrating" className="w-full h-full object-cover" src={schoolMemoriesHero} />
+                    <img alt="Independence Day Celebrations" className="w-full h-full object-cover object-center" src={independenceDayCelebrations} />
                   </div>
                   <div className="rounded-2xl overflow-hidden shadow-elegant-lg bg-secondary aspect-square card-hover">
                     <img src={schoolDancePerformances} alt="School Dance Performances" className="w-full h-full object-cover object-top" />
