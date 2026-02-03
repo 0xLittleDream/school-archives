@@ -141,4 +141,92 @@
   .shadow-elegant-lg {
     box-shadow: 0 10px 40px -4px rgba(26, 54, 93, 0.15), 0 4px 16px -4px rgba(26, 54, 93, 0.1);
   }
+
+  /* Glass morphism */
+  .glass {
+    @apply bg-background/80 backdrop-blur-xl;
+  }
+
+  .glass-card {
+    @apply bg-card/90 backdrop-blur-lg border border-border/50;
+  }
 }
+
+/* Infinite scroll animations */
+@keyframes scroll-left {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes scroll-right {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.animate-scroll-left {
+  animation: scroll-left 40s linear infinite;
+}
+
+.animate-scroll-right {
+  animation: scroll-right 40s linear infinite;
+}
+
+.animate-scroll-left:hover,
+.animate-scroll-right:hover {
+  animation-play-state: paused;
+}
+
+/* Mobile-specific enhancements */
+@media (max-width: 768px) {
+  .container {
+    @apply px-5;
+  }
+
+  h1 {
+    @apply text-3xl leading-tight;
+  }
+
+  h2 {
+    @apply text-2xl leading-tight;
+  }
+
+  .mobile-card {
+    @apply rounded-2xl p-5;
+  }
+}
+
+/* Smooth transitions for all interactive elements */
+button, a, .interactive {
+  @apply transition-all duration-200;
+}
+
+/* Enhanced focus states */
+*:focus-visible {
+  @apply outline-none ring-2 ring-accent ring-offset-2 ring-offset-background;
+}
+
+/* Gradient text for dark mode */
+.dark .text-gradient {
+  @apply from-[hsl(210,40%,98%)] to-[hsl(var(--royal-blue))];
+}
+
+/* Premium card hover effect */
+.card-hover {
+  @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-elegant-lg;
+}
+
+/* Staggered animation helper */
+.stagger-1 { animation-delay: 50ms; }
+.stagger-2 { animation-delay: 100ms; }
+.stagger-3 { animation-delay: 150ms; }
+.stagger-4 { animation-delay: 200ms; }
+.stagger-5 { animation-delay: 250ms; }
+.stagger-6 { animation-delay: 300ms; }

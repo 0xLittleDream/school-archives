@@ -12,6 +12,7 @@ import Events from "./pages/Events";
 import About from "./pages/About";
 import Admin from "./pages/Admin";
 import CollectionDetail from "./pages/CollectionDetail";
+import CollectionEditor from "./pages/CollectionEditor";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,6 +36,7 @@ const App = () => (
             
             {/* Admin Routes */}
             <Route path="/admin" element={<Admin />} />
+            <Route path="/admin/collection/:id" element={<CollectionEditor />} />
             
             {/* Catch-all */}
             <Route path="*" element={<NotFound />} />

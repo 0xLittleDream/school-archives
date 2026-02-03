@@ -4,7 +4,7 @@ import { Layout } from '@/components/layout/Layout';
 import { useCollections, useTags } from '@/hooks/useDatabase';
 import { useBranch } from '@/contexts/BranchContext';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Camera, Filter, Search, Grid3X3, LayoutGrid } from 'lucide-react';
+import { Camera, Filter, Search, Grid3X3, LayoutGrid, Sparkles, Calendar, Play } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 
 const Memories = () => {
@@ -26,18 +26,19 @@ const Memories = () => {
 
   return (
     <Layout>
-      {/* Hero Header */}
-      <section className="relative py-16 md:py-24 overflow-hidden">
+      {/* Hero Header - Mobile Optimized */}
+      <section className="relative py-12 md:py-24 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
         <div className="container relative">
           <div className="max-w-3xl">
-            <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium tracking-wide mb-6">
+            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium tracking-wide mb-6">
+              <Sparkles className="h-4 w-4" />
               {selectedBranch?.name || 'All Branches'} • Photo Gallery
             </span>
-            <h1 className="font-display text-5xl md:text-6xl font-bold text-foreground mb-4">
+            <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-4">
               Memory Collections
             </h1>
-            <p className="text-muted-foreground text-xl leading-relaxed">
+            <p className="text-muted-foreground text-lg md:text-xl leading-relaxed">
               Explore our curated galleries of cherished moments, celebrations, and milestones 
               from {selectedBranch?.name || 'across the NCS community'}.
             </p>
@@ -46,26 +47,26 @@ const Memories = () => {
       </section>
 
       <div className="container pb-16">
-        {/* Filters Bar */}
-        <div className="sticky top-16 z-20 bg-background/95 backdrop-blur-sm py-4 mb-8 border-b border-border">
-          <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
+        {/* Filters Bar - Sticky and Mobile Friendly */}
+        <div className="sticky top-16 z-20 bg-background/95 backdrop-blur-sm py-4 mb-6 -mx-4 px-4 md:mx-0 md:px-0 border-b border-border">
+          <div className="flex flex-col md:flex-row gap-4 justify-between items-stretch md:items-center">
             {/* Search */}
-            <div className="relative w-full md:w-80">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search collections..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
+                className="pl-11 h-12 rounded-xl"
               />
             </div>
 
             {/* View Toggle */}
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground mr-2">View:</span>
+            <div className="flex items-center gap-2 justify-end">
+              <span className="text-sm text-muted-foreground mr-2 hidden sm:inline">View:</span>
               <button
                 onClick={() => setViewMode('grid')}
-                className={`p-2 rounded-lg transition-colors ${
+                className={`p-3 rounded-xl transition-colors ${
                   viewMode === 'grid' ? 'bg-primary text-primary-foreground' : 'bg-secondary hover:bg-secondary/80'
                 }`}
               >
@@ -73,7 +74,7 @@ const Memories = () => {
               </button>
               <button
                 onClick={() => setViewMode('masonry')}
-                className={`p-2 rounded-lg transition-colors ${
+                className={`p-3 rounded-xl transition-colors ${
                   viewMode === 'masonry' ? 'bg-primary text-primary-foreground' : 'bg-secondary hover:bg-secondary/80'
                 }`}
               >
@@ -83,12 +84,12 @@ const Memories = () => {
           </div>
         </div>
 
-        {/* Filter tags */}
-        <div className="flex items-center gap-2 mb-8 overflow-x-auto pb-2">
+        {/* Filter tags - Horizontally scrollable on mobile */}
+        <div className="flex items-center gap-2 mb-8 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
           <Filter className="h-4 w-4 text-muted-foreground flex-shrink-0" />
           <button
             onClick={() => setSelectedTagId(null)}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
+            className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap ${
               selectedTagId === null
                 ? 'bg-primary text-primary-foreground shadow-elegant'
                 : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
@@ -98,14 +99,14 @@ const Memories = () => {
           </button>
           {tagsLoading ? (
             Array.from({ length: 4 }, (_, i) => (
-              <Skeleton key={i} className="h-9 w-24 rounded-full flex-shrink-0" />
+              <Skeleton key={i} className="h-10 w-24 rounded-xl flex-shrink-0" />
             ))
           ) : (
             tags?.map((tag) => (
               <button
                 key={tag.id}
                 onClick={() => setSelectedTagId(tag.id)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
+                className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap ${
                   selectedTagId === tag.id
                     ? 'text-white shadow-elegant'
                     : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
@@ -118,15 +119,22 @@ const Memories = () => {
           )}
         </div>
 
-        {/* Collections grid */}
-        <div className={`grid gap-6 ${
+        {/* Results count */}
+        {!collectionsLoading && filteredCollections && (
+          <p className="text-sm text-muted-foreground mb-6">
+            {filteredCollections.length} collection{filteredCollections.length !== 1 ? 's' : ''} found
+          </p>
+        )}
+
+        {/* Collections grid - Enhanced mobile layout */}
+        <div className={`grid gap-5 md:gap-6 ${
           viewMode === 'grid' 
-            ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' 
-            : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
+            ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' 
+            : 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
         }`}>
           {collectionsLoading ? (
             Array.from({ length: 6 }, (_, i) => (
-              <Skeleton key={i} className="aspect-[4/3] rounded-2xl" />
+              <Skeleton key={i} className={`rounded-2xl ${viewMode === 'masonry' ? 'aspect-[3/4]' : 'aspect-[4/3]'}`} />
             ))
           ) : filteredCollections && filteredCollections.length > 0 ? (
             filteredCollections.map((collection, i) => (
@@ -138,7 +146,9 @@ const Memories = () => {
                 }`}
                 style={{ 
                   animationDelay: `${i * 50}ms`,
-                  aspectRatio: viewMode === 'masonry' && i % 3 === 0 ? '3/4' : '4/3'
+                  aspectRatio: viewMode === 'masonry' 
+                    ? (i % 3 === 0 ? '3/4' : '1/1') 
+                    : '4/3'
                 }}
               >
                 {collection.cover_image_url ? (
@@ -149,17 +159,26 @@ const Memories = () => {
                   />
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-secondary to-secondary/50">
-                    <Camera className="h-16 w-16 text-muted-foreground/30" />
+                    <Camera className="h-12 w-12 text-muted-foreground/30" />
                   </div>
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/30 to-transparent opacity-90 group-hover:opacity-100 transition-opacity" />
-                <div className="absolute bottom-0 left-0 right-0 p-6">
+                
+                {/* Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/30 to-transparent opacity-80 group-hover:opacity-100 transition-opacity" />
+                
+                {/* Play indicator */}
+                <div className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Play className="h-4 w-4 text-white fill-white" />
+                </div>
+                
+                {/* Content */}
+                <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6">
                   {collection.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mb-3">
-                      {collection.tags.slice(0, 3).map((tag) => (
+                    <div className="flex flex-wrap gap-1.5 mb-2 md:mb-3">
+                      {collection.tags.slice(0, viewMode === 'masonry' ? 2 : 3).map((tag) => (
                         <span
                           key={tag.id}
-                          className="inline-block px-2.5 py-1 text-xs font-semibold rounded-full backdrop-blur-sm"
+                          className="inline-block px-2 py-0.5 md:px-2.5 md:py-1 text-[10px] md:text-xs font-semibold rounded-full backdrop-blur-sm"
                           style={{ backgroundColor: `${tag.color}dd`, color: '#fff' }}
                         >
                           {tag.name}
@@ -167,12 +186,20 @@ const Memories = () => {
                       ))}
                     </div>
                   )}
-                  <h3 className="font-display text-xl font-semibold text-white mb-1">
+                  <h3 className="font-display text-base md:text-xl font-semibold text-white mb-1 line-clamp-2">
                     {collection.title}
                   </h3>
-                  <p className="text-white/70 text-sm">
-                    {collection.photo_count} photos
-                    {collection.event_date && ` • ${new Date(collection.event_date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}`}
+                  <p className="text-white/70 text-xs md:text-sm flex items-center gap-2">
+                    <span className="flex items-center gap-1">
+                      <Camera className="h-3 w-3" />
+                      {collection.photo_count}
+                    </span>
+                    {collection.event_date && (
+                      <span className="flex items-center gap-1">
+                        <Calendar className="h-3 w-3" />
+                        {new Date(collection.event_date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                      </span>
+                    )}
                   </p>
                 </div>
               </Link>
