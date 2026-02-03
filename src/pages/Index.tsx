@@ -152,8 +152,8 @@ const Index = () => {
             {/* Left - Image */}
             <div className="relative animate-fade-in order-2 lg:order-1">
               <div className="relative rounded-3xl overflow-hidden shadow-elegant-lg bg-secondary aspect-[4/5] flex flex-col">
-                <img src={navyDayArt1} alt="Navy Day Student Art 1" className="w-full h-1/2 object-cover" />
-                <img src={navyDayArt2} alt="Navy Day Student Art 2" className="w-full h-1/2 object-cover" />
+                <img alt="Navy Day Student Art 1" className="w-full h-1/2 object-cover" src="/lovable-uploads/50ee7bc2-5303-4a75-ad11-7ef63e75b298.jpg" />
+                <img alt="Navy Day Student Art 2" className="w-full h-1/2 object-cover" src="/lovable-uploads/ff3b4698-e22a-4264-9535-16f04e01028a.jpg" />
                 <div className="absolute inset-0 bg-gradient-to-t from-primary/30 via-transparent to-transparent pointer-events-none" />
               </div>
               
