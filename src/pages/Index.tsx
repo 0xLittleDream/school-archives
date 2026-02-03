@@ -6,6 +6,7 @@ import { useFeaturedCollections, useStats } from '@/hooks/useDatabase';
 import { useBranch } from '@/contexts/BranchContext';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ImageGallerySection } from '@/components/home/ImageGallerySection';
+import schoolMemoriesHero from '@/assets/school-memories-hero.jpg';
 const Index = () => {
   const {
     selectedBranch,
@@ -100,7 +101,7 @@ const Index = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-4">
                   <div className="rounded-2xl overflow-hidden shadow-elegant-lg bg-secondary aspect-[3/4] card-hover">
-                    <img alt="Students celebrating" className="w-full h-full object-contain" src="/lovable-uploads/88b8bfee-523d-449c-b3b8-8535cca477d6.jpg" />
+                    <img alt="Students celebrating" className="w-full h-full object-cover" src={schoolMemoriesHero} />
                   </div>
                   <div className="rounded-2xl overflow-hidden shadow-elegant-lg bg-secondary aspect-square card-hover">
                     <img src="https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?q=80&w=400" alt="Graduation" className="w-full h-full object-cover" />
