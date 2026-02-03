@@ -8,6 +8,7 @@ import Memories from "./pages/Memories";
 import Farewell2025 from "./pages/Farewell2025";
 import Events from "./pages/Events";
 import About from "./pages/About";
+import CollectionDetail from "./pages/CollectionDetail";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/farewell-2025" element={<Farewell2025 />} />
           <Route path="/events" element={<Events />} />
           <Route path="/about" element={<About />} />
+          <Route path="/collection/:id" element={<CollectionDetail />} />
           
           {/* Admin Routes - Coming Soon */}
           {/* <Route path="/admin/login" element={<AdminLogin />} /> */}
