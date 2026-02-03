@@ -239,6 +239,9 @@ const About = () => {
                 @dr3am8r
               </span>
             </a>
+            <p className="text-muted-foreground text-sm mt-3 tracking-wide">
+              from Class 11th (as of 2025)
+            </p>
           </div>
         </div>
       </section>
