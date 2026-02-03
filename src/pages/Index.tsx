@@ -8,6 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ImageGallerySection } from '@/components/home/ImageGallerySection';
 import schoolMemoriesHero from '@/assets/school-memories-hero.jpg';
 import schoolEvent from '@/assets/school-event.jpg';
+import navyChildrenSchool from '@/assets/navy-children-school.jpg';
 const Index = () => {
   const {
     selectedBranch,
@@ -144,7 +145,7 @@ const Index = () => {
             {/* Left - Image */}
             <div className="relative animate-fade-in order-2 lg:order-1">
               <div className="relative rounded-3xl overflow-hidden shadow-elegant-lg bg-secondary aspect-[4/5]">
-                <img src="https://images.unsplash.com/photo-1546410531-bb4caa6b424d?q=80&w=800" alt="School Memories" className="w-full h-full object-cover" />
+                <img src={navyChildrenSchool} alt="Navy Children School" className="w-full h-full object-cover object-center" />
                 <div className="absolute inset-0 bg-gradient-to-t from-primary/30 via-transparent to-transparent" />
               </div>
               
