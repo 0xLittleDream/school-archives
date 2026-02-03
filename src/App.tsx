@@ -8,7 +8,7 @@ import { BranchSelectionModal } from "@/components/BranchSelectionModal";
 import Index from "./pages/Index";
 import Memories from "./pages/Memories";
 import Farewell2025 from "./pages/Farewell2025";
-import Events from "./pages/Events";
+
 import About from "./pages/About";
 import Admin from "./pages/Admin";
 import CollectionDetail from "./pages/CollectionDetail";
@@ -32,7 +32,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/memories" element={<Memories />} />
             <Route path="/farewell-2025" element={<Farewell2025 />} />
-            <Route path="/events" element={<Events />} />
+            
             <Route path="/about" element={<About />} />
             <Route path="/collection/:id" element={<CollectionDetail />} />
             <Route path="/page/:slug" element={<CustomPage />} />

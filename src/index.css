@@ -131,7 +131,11 @@
   }
 
   .text-gradient {
-    @apply bg-gradient-to-r from-[hsl(var(--navy))] to-[hsl(var(--royal-blue))] bg-clip-text text-transparent;
+    background: linear-gradient(to right, hsl(var(--navy)), hsl(var(--royal-blue)));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
   }
 
   .shadow-elegant {
