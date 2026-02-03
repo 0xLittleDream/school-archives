@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { Heart, Laugh, Frown } from 'lucide-react';
 import type { ReactionType } from '@/types/reactions';
 
 interface PhotoReactionsProps {
@@ -7,16 +6,25 @@ interface PhotoReactionsProps {
   className?: string;
 }
 
-const REACTIONS: { type: ReactionType; emoji: string; icon: typeof Heart; label: string }[] = [
-  { type: 'heart', emoji: '❤️', icon: Heart, label: 'Love' },
-  { type: 'laugh', emoji: '😂', icon: Laugh, label: 'Haha' },
-  { type: 'cry', emoji: '🥹', icon: Frown, label: 'Touched' },
+type AllowedReaction = 'heart' | 'cry';
+
+const REACTIONS: { type: AllowedReaction; emoji: string; label: string }[] = [
+  { type: 'heart', emoji: '❤️', label: 'Love' },
+  { type: 'cry', emoji: '🥹', label: 'Touched' },
 ];
 
 const STORAGE_KEY = 'photo_reactions';
+const COUNTS_KEY = 'photo_reaction_counts';
 
 interface StoredReactions {
-  [photoId: string]: ReactionType[];
+  [photoId: string]: AllowedReaction[];
+}
+
+interface StoredCounts {
+  [photoId: string]: {
+    heart: number;
+    cry: number;
+  };
 }
 
 function getStoredReactions(): StoredReactions {
@@ -36,55 +44,85 @@ function setStoredReactions(reactions: StoredReactions) {
   }
 }
 
+function getStoredCounts(): StoredCounts {
+  try {
+    const stored = localStorage.getItem(COUNTS_KEY);
+    return stored ? JSON.parse(stored) : {};
+  } catch {
+    return {};
+  }
+}
+
+function setStoredCounts(counts: StoredCounts) {
+  try {
+    localStorage.setItem(COUNTS_KEY, JSON.stringify(counts));
+  } catch {
+    // Storage full or not available
+  }
+}
+
 export function PhotoReactions({ photoId, className }: PhotoReactionsProps) {
-  const [userReactions, setUserReactions] = useState<ReactionType[]>([]);
+  const [userReactions, setUserReactions] = useState<AllowedReaction[]>([]);
+  const [counts, setCounts] = useState<{ heart: number; cry: number }>({ heart: 0, cry: 0 });
 
   useEffect(() => {
-    const stored = getStoredReactions();
-    setUserReactions(stored[photoId] || []);
+    const storedReactions = getStoredReactions();
+    const storedCounts = getStoredCounts();
+    setUserReactions(storedReactions[photoId] || []);
+    setCounts(storedCounts[photoId] || { heart: 0, cry: 0 });
   }, [photoId]);
 
-  const hasUserReacted = (type: ReactionType) => userReactions.includes(type);
+  const hasUserReacted = (type: AllowedReaction) => userReactions.includes(type);
 
-  const handleReaction = (type: ReactionType) => {
-    const stored = getStoredReactions();
-    const currentReactions = stored[photoId] || [];
+  const handleReaction = (type: AllowedReaction) => {
+    const storedReactions = getStoredReactions();
+    const storedCounts = getStoredCounts();
+    const currentReactions = storedReactions[photoId] || [];
+    const currentCounts = storedCounts[photoId] || { heart: 0, cry: 0 };
     
-    let newReactions: ReactionType[];
+    let newReactions: AllowedReaction[];
+    let newCounts = { ...currentCounts };
+    
     if (currentReactions.includes(type)) {
       // Remove reaction
       newReactions = currentReactions.filter(r => r !== type);
+      newCounts[type] = Math.max(0, newCounts[type] - 1);
     } else {
       // Add reaction
       newReactions = [...currentReactions, type];
+      newCounts[type] = newCounts[type] + 1;
     }
     
-    stored[photoId] = newReactions;
-    setStoredReactions(stored);
+    storedReactions[photoId] = newReactions;
+    storedCounts[photoId] = newCounts;
+    setStoredReactions(storedReactions);
+    setStoredCounts(storedCounts);
     setUserReactions(newReactions);
+    setCounts(newCounts);
   };
 
   return (
-    <div className={`flex items-center gap-2 ${className}`}>
+    <div className={`flex items-center gap-3 ${className}`}>
       {REACTIONS.map(({ type, emoji, label }) => {
         const isActive = hasUserReacted(type);
+        const count = counts[type];
         
         return (
           <button
             key={type}
             onClick={() => handleReaction(type)}
-            className={`flex items-center gap-1.5 px-4 py-2.5 rounded-full transition-all duration-200 ${
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-full transition-all duration-200 ${
               isActive 
                 ? 'bg-white text-foreground scale-110 shadow-lg ring-2 ring-primary/50' 
                 : 'bg-white/10 hover:bg-white/20 text-white hover:scale-105'
             }`}
             title={label}
           >
-            <span className={`text-xl transition-transform duration-200 ${isActive ? 'animate-pulse' : ''}`}>
-              {emoji}
-            </span>
-            {isActive && (
-              <span className="text-xs font-semibold text-primary">Liked</span>
+            <span className="text-xl">{emoji}</span>
+            {count > 0 && (
+              <span className={`text-sm font-semibold ${isActive ? 'text-primary' : 'text-white'}`}>
+                {count}
+              </span>
             )}
           </button>
         );
