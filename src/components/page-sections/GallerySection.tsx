@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Camera, Sparkles, ArrowRight } from 'lucide-react';
+import { Camera, Sparkles, ArrowRight, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { usePhotos } from '@/hooks/useDatabase';
@@ -12,6 +12,23 @@ interface GallerySectionProps {
 export function GallerySection({ section }: GallerySectionProps) {
   const metadata = (section.metadata || {}) as GalleryMetadata;
   const { data: photos, isLoading } = usePhotos(metadata.collection_id || '');
+
+  const handleDownload = async (imageUrl: string, caption?: string) => {
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = caption ? `${caption.replace(/[^a-z0-9]/gi, '_')}.jpg` : 'photo.jpg';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Download failed:', error);
+    }
+  };
 
   return (
     <section className="py-16 md:py-24 bg-card">
@@ -54,6 +71,19 @@ export function GallerySection({ section }: GallerySectionProps) {
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
                 <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/20 transition-colors duration-300" />
+                
+                {/* Download Button */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDownload(photo.image_url, photo.caption);
+                  }}
+                  className="absolute top-3 right-3 p-2 rounded-full bg-background/90 text-foreground opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-primary hover:text-primary-foreground shadow-lg"
+                  title="Download photo"
+                >
+                  <Download className="h-4 w-4" />
+                </button>
+
                 {photo.caption && (
                   <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
                     <p className="text-white text-sm line-clamp-2">{photo.caption}</p>
