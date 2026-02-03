@@ -2,16 +2,21 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { useCollections, useTags } from '@/hooks/useDatabase';
+import { useBranch } from '@/contexts/BranchContext';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Camera, Filter, Search, Grid3X3, LayoutGrid } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 
 const Memories = () => {
+  const { selectedBranch, selectedBranchId } = useBranch();
   const [selectedTagId, setSelectedTagId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'masonry'>('grid');
   const { data: tags, isLoading: tagsLoading } = useTags();
-  const { data: collections, isLoading: collectionsLoading } = useCollections(undefined, selectedTagId || undefined);
+  const { data: collections, isLoading: collectionsLoading } = useCollections(
+    selectedBranchId || undefined, 
+    selectedTagId || undefined
+  );
 
   // Filter by search query
   const filteredCollections = collections?.filter(collection => 
@@ -27,14 +32,14 @@ const Memories = () => {
         <div className="container relative">
           <div className="max-w-3xl">
             <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium tracking-wide mb-6">
-              Photo Gallery
+              {selectedBranch?.name || 'All Branches'} • Photo Gallery
             </span>
             <h1 className="font-display text-5xl md:text-6xl font-bold text-foreground mb-4">
               Memory Collections
             </h1>
             <p className="text-muted-foreground text-xl leading-relaxed">
               Explore our curated galleries of cherished moments, celebrations, and milestones 
-              from across the NCS community.
+              from {selectedBranch?.name || 'across the NCS community'}.
             </p>
           </div>
         </div>
@@ -42,7 +47,7 @@ const Memories = () => {
 
       <div className="container pb-16">
         {/* Filters Bar */}
-        <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm py-4 mb-8 border-b border-border">
+        <div className="sticky top-16 z-20 bg-background/95 backdrop-blur-sm py-4 mb-8 border-b border-border">
           <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
             {/* Search */}
             <div className="relative w-full md:w-80">
@@ -181,7 +186,7 @@ const Memories = () => {
                   ? `No results for "${searchQuery}". Try a different search term.`
                   : selectedTagId 
                     ? 'No collections with this tag yet.'
-                    : 'Collections will appear here once added.'}
+                    : `No collections for ${selectedBranch?.name || 'this branch'} yet.`}
               </p>
             </div>
           )}

@@ -3,11 +3,13 @@ import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Camera, ArrowRight, Heart, Users, Sparkles, GraduationCap } from 'lucide-react';
 import { useFeaturedCollections, useStats } from '@/hooks/useDatabase';
+import { useBranch } from '@/contexts/BranchContext';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const Index = () => {
-  const { data: featuredCollections, isLoading: collectionsLoading } = useFeaturedCollections();
-  const { data: stats, isLoading: statsLoading } = useStats();
+  const { selectedBranch, selectedBranchId } = useBranch();
+  const { data: featuredCollections, isLoading: collectionsLoading } = useFeaturedCollections(selectedBranchId || undefined);
+  const { data: stats, isLoading: statsLoading } = useStats(selectedBranchId || undefined);
 
   return (
     <Layout>
@@ -26,7 +28,7 @@ const Index = () => {
               <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20 mb-8">
                 <Sparkles className="w-4 h-4 text-accent" />
                 <span className="text-sm font-medium tracking-wide text-foreground">
-                  Official School Archive
+                  {selectedBranch ? selectedBranch.name : 'Official School Archive'}
                 </span>
               </div>
 
@@ -40,7 +42,7 @@ const Index = () => {
               {/* Description */}
               <p className="text-lg md:text-xl text-muted-foreground max-w-lg mb-10 leading-relaxed">
                 Preserving precious moments. Celebrating extraordinary journeys. A digital archive 
-                crafted with love for the NCS community.
+                crafted with love for the {selectedBranch?.name || 'NCS'} community.
               </p>
 
               {/* CTA Buttons */}
@@ -135,7 +137,7 @@ const Index = () => {
             {/* Right - Content */}
             <div className="order-1 lg:order-2 animate-fade-in" style={{ animationDelay: '200ms' }}>
               <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium tracking-wide mb-6">
-                About NCS Memories
+                About {selectedBranch?.name || 'NCS Memories'}
               </span>
               
               <h2 className="font-display text-4xl md:text-5xl font-bold leading-tight mb-6">
