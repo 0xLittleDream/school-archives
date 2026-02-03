@@ -2,10 +2,8 @@ import { Layout } from '@/components/layout/Layout';
 import { Heart, Users, Camera, Award, Sparkles, BookOpen, Globe, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-
 const About = () => {
-  return (
-    <Layout>
+  return <Layout>
       {/* Hero Section */}
       <section className="relative py-20 md:py-32 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-secondary/50 via-background to-background" />
@@ -141,36 +139,27 @@ const About = () => {
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-            {[
-              {
-                icon: Users,
-                title: 'Community-Driven',
-                description: 'Built with care by students, for the entire school community.',
-                gradient: 'from-blue-500/10 to-indigo-500/10',
-              },
-              {
-                icon: Globe,
-                title: 'Multi-Branch Support',
-                description: 'Dedicated spaces for each school campus, preserving their unique stories.',
-                gradient: 'from-purple-500/10 to-pink-500/10',
-              },
-              {
-                icon: Camera,
-                title: 'Curated Collections',
-                description: 'Memories organized by events, years, and categories for effortless discovery.',
-                gradient: 'from-amber-500/10 to-orange-500/10',
-              },
-              {
-                icon: Award,
-                title: 'Preserved with Quality',
-                description: 'High-quality visuals maintained to keep moments vivid for years to come.',
-                gradient: 'from-emerald-500/10 to-teal-500/10',
-              },
-            ].map((feature, i) => (
-              <div
-                key={i}
-                className="group relative p-6 md:p-8 rounded-2xl bg-card border border-border hover:border-primary/20 hover:shadow-elegant-lg transition-all duration-300"
-              >
+            {[{
+            icon: Users,
+            title: 'Community-Driven',
+            description: 'Built with care by students, for the entire school community.',
+            gradient: 'from-blue-500/10 to-indigo-500/10'
+          }, {
+            icon: Globe,
+            title: 'Multi-Branch Support',
+            description: 'Dedicated spaces for each school campus, preserving their unique stories.',
+            gradient: 'from-purple-500/10 to-pink-500/10'
+          }, {
+            icon: Camera,
+            title: 'Curated Collections',
+            description: 'Memories organized by events, years, and categories for effortless discovery.',
+            gradient: 'from-amber-500/10 to-orange-500/10'
+          }, {
+            icon: Award,
+            title: 'Preserved with Quality',
+            description: 'High-quality visuals maintained to keep moments vivid for years to come.',
+            gradient: 'from-emerald-500/10 to-teal-500/10'
+          }].map((feature, i) => <div key={i} className="group relative p-6 md:p-8 rounded-2xl bg-card border border-border hover:border-primary/20 hover:shadow-elegant-lg transition-all duration-300">
                 <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
                 
                 <div className="relative">
@@ -186,8 +175,7 @@ const About = () => {
                     {feature.description}
                   </p>
                 </div>
-              </div>
-            ))}
+              </div>)}
           </div>
         </div>
       </section>
@@ -229,19 +217,12 @@ const About = () => {
             <p className="text-muted-foreground text-sm mb-3 tracking-wide">
               Crafted with dedication by
             </p>
-            <a 
-              href="https://www.instagram.com/dr3am8r" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary/5 hover:bg-primary/10 border border-primary/10 hover:border-primary/20 transition-all duration-300 group"
-            >
+            <a href="https://www.instagram.com/dr3am8r" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary/5 hover:bg-primary/10 border border-primary/10 hover:border-primary/20 transition-all duration-300 group">
               <span className="font-semibold text-foreground group-hover:text-primary transition-colors">
                 @dr3am8r
               </span>
             </a>
-            <p className="text-muted-foreground text-sm mt-3 tracking-wide">
-              from Class 11th (as of 2025)
-            </p>
+            <p className="text-muted-foreground text-sm mt-3 tracking-wide">from Class 11th (as of 2025) NCSV</p>
           </div>
         </div>
       </section>
@@ -256,12 +237,7 @@ const About = () => {
             <p className="text-primary-foreground/80 mb-8">
               Discover the memories that define our community.
             </p>
-            <Button 
-              asChild 
-              size="lg" 
-              variant="secondary"
-              className="h-14 px-8 font-semibold rounded-xl"
-            >
+            <Button asChild size="lg" variant="secondary" className="h-14 px-8 font-semibold rounded-xl">
               <Link to="/memories">
                 <Camera className="w-5 h-5 mr-2" />
                 Browse Collections
@@ -270,8 +246,6 @@ const About = () => {
           </div>
         </div>
       </section>
-    </Layout>
-  );
+    </Layout>;
 };
-
 export default About;
