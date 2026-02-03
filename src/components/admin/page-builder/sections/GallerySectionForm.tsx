@@ -47,14 +47,14 @@ export function GallerySectionForm({ section, onChange }: GallerySectionFormProp
       <div className="space-y-2">
         <Label>Link to Collection</Label>
         <Select 
-          value={metadata.collection_id || ''} 
-          onValueChange={(value) => updateMetadata({ collection_id: value || undefined })}
+          value={metadata.collection_id || 'none'} 
+          onValueChange={(value) => updateMetadata({ collection_id: value === 'none' ? undefined : value })}
         >
           <SelectTrigger>
             <SelectValue placeholder="Choose a collection..." />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">No collection linked</SelectItem>
+            <SelectItem value="none">No collection linked</SelectItem>
             {collections?.map((collection) => (
               <SelectItem key={collection.id} value={collection.id}>
                 {collection.title} ({collection.photo_count} photos)
