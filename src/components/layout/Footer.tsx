@@ -16,8 +16,8 @@ export function Footer() {
           </div>
 
           {/* Creator Credit */}
-          <div className="flex items-center gap-2 text-sm text-primary-foreground/70">
-            <span>Website created solely by</span>
+          <div className="flex flex-wrap items-center justify-center md:justify-end gap-1.5 text-sm text-primary-foreground/70">
+            <span>Crafted with dedication by</span>
             <a
               href="https://www.instagram.com/dr3am8r"
               target="_blank"
@@ -27,6 +27,7 @@ export function Footer() {
               <Instagram className="h-4 w-4" />
               @dr3am8r
             </a>
+            <span>from Class 11th (as of 2025)</span>
           </div>
         </div>
 
