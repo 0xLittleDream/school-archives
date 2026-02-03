@@ -2,6 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { BranchIndicator } from './BranchIndicator';
 import { cn } from '@/lib/utils';
 
 const navLinks = [
@@ -25,12 +26,17 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
-        {/* Logo */}
-        <Link to="/" className="flex items-center space-x-2">
-          <span className="font-display text-2xl font-bold text-primary">
-            Ncs<span className="text-accent">Memories</span>
-          </span>
-        </Link>
+        {/* Logo + Branch */}
+        <div className="flex items-center gap-4">
+          <Link to="/" className="flex items-center space-x-2">
+            <span className="font-display text-2xl font-bold text-primary">
+              Ncs<span className="text-accent">Memories</span>
+            </span>
+          </Link>
+          <div className="hidden sm:block">
+            <BranchIndicator />
+          </div>
+        </div>
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-1">
@@ -66,6 +72,10 @@ export function Header() {
       {isMobileMenuOpen && (
         <div className="md:hidden border-t border-border/40 bg-background">
           <nav className="container py-4 flex flex-col space-y-1">
+            {/* Mobile Branch Indicator */}
+            <div className="px-4 py-2 mb-2">
+              <BranchIndicator />
+            </div>
             {navLinks.map((link) => (
               <Link
                 key={link.href}

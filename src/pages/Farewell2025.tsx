@@ -2,8 +2,11 @@ import { Layout } from '@/components/layout/Layout';
 import { Camera, Heart, GraduationCap, Calendar, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
+import { useBranch } from '@/contexts/BranchContext';
 
 const Farewell2025 = () => {
+  const { selectedBranch } = useBranch();
+
   return (
     <Layout>
       {/* Hero */}
@@ -30,8 +33,8 @@ const Farewell2025 = () => {
             </h1>
             
             <p className="text-muted-foreground text-xl leading-relaxed mb-8 max-w-xl mx-auto">
-              Celebrating the journey of our graduating class. Memories that will last a lifetime, 
-              friendships that will never fade.
+              Celebrating the journey of our graduating class at {selectedBranch?.name || 'NCS'}. 
+              Memories that will last a lifetime, friendships that will never fade.
             </p>
 
             {/* Event Details */}
@@ -42,7 +45,7 @@ const Farewell2025 = () => {
               </span>
               <span className="flex items-center gap-2 px-4 py-2 rounded-full bg-card border border-border">
                 <MapPin className="h-4 w-4 text-primary" />
-                NCS Vizag
+                {selectedBranch?.name || 'NCS Campus'}
               </span>
             </div>
 
