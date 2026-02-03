@@ -10,6 +10,8 @@ import schoolMemoriesHero from '@/assets/school-memories-hero.jpg';
 import schoolEvent from '@/assets/school-event.jpg';
 import navyChildrenSchool from '@/assets/navy-children-school.jpg';
 import navyShipVisit from '@/assets/navy-ship-visit.jpg';
+import navyDayArt1 from '@/assets/navy-day-art-1.jpg';
+import navyDayArt2 from '@/assets/navy-day-art-2.jpg';
 const Index = () => {
   const {
     selectedBranch,
@@ -145,9 +147,10 @@ const Index = () => {
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-24 items-center">
             {/* Left - Image */}
             <div className="relative animate-fade-in order-2 lg:order-1">
-              <div className="relative rounded-3xl overflow-hidden shadow-elegant-lg bg-secondary aspect-[4/5]">
-                <img src={navyChildrenSchool} alt="Navy Children School" className="w-full h-full object-cover object-center" />
-                <div className="absolute inset-0 bg-gradient-to-t from-primary/30 via-transparent to-transparent" />
+              <div className="relative rounded-3xl overflow-hidden shadow-elegant-lg bg-secondary aspect-[4/5] flex flex-col">
+                <img src={navyDayArt1} alt="Navy Day Student Art 1" className="w-full h-1/2 object-cover" />
+                <img src={navyDayArt2} alt="Navy Day Student Art 2" className="w-full h-1/2 object-cover" />
+                <div className="absolute inset-0 bg-gradient-to-t from-primary/30 via-transparent to-transparent pointer-events-none" />
               </div>
               
               {/* Quote Card */}
