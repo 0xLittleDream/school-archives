@@ -154,17 +154,26 @@ export function useCreateCustomPage() {
   
   return useMutation({
     mutationFn: async (data: CreatePageData) => {
+      // Build insert object dynamically to avoid schema cache issues with null fields
+      const insertData: Record<string, unknown> = {
+        title: data.title,
+        slug: data.slug,
+        page_type: data.page_type,
+        branch_id: data.branch_id,
+        is_published: false,
+      };
+      
+      // Only include optional fields if they have values
+      if (data.cover_image_url) {
+        insertData.cover_image_url = data.cover_image_url;
+      }
+      if (data.meta_description) {
+        insertData.meta_description = data.meta_description;
+      }
+      
       const { data: result, error } = await supabase
         .from('custom_pages')
-        .insert({
-          title: data.title,
-          slug: data.slug,
-          page_type: data.page_type,
-          branch_id: data.branch_id,
-          cover_image_url: data.cover_image_url || null,
-          meta_description: data.meta_description || null,
-          is_published: false,
-        })
+        .insert(insertData)
         .select()
         .single();
       
