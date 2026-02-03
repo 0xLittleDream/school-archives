@@ -190,7 +190,65 @@ CREATE TRIGGER update_site_content_updated_at BEFORE UPDATE ON public.site_conte
     FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
 -- ===========================================
--- 7. SAMPLE DATA (Optional - run separately if needed)
+-- 7. CUSTOM PAGES TABLES
+-- ===========================================
+
+-- Custom Pages table (for page builder)
+CREATE TABLE public.custom_pages (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    title TEXT NOT NULL,
+    slug TEXT NOT NULL,
+    page_type TEXT NOT NULL DEFAULT 'generic',
+    branch_id UUID REFERENCES public.branches(id) ON DELETE CASCADE NOT NULL,
+    cover_image_url TEXT,
+    is_published BOOLEAN DEFAULT false,
+    meta_description TEXT,
+    created_at TIMESTAMPTZ DEFAULT now() NOT NULL,
+    updated_at TIMESTAMPTZ DEFAULT now() NOT NULL,
+    UNIQUE (slug, branch_id)
+);
+
+-- Page Sections table (content blocks for custom pages)
+CREATE TABLE public.page_sections (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    page_id UUID REFERENCES public.custom_pages(id) ON DELETE CASCADE NOT NULL,
+    section_type TEXT NOT NULL,
+    title TEXT,
+    subtitle TEXT,
+    content TEXT,
+    image_url TEXT,
+    metadata JSONB DEFAULT '{}',
+    sort_order INTEGER DEFAULT 0,
+    created_at TIMESTAMPTZ DEFAULT now() NOT NULL
+);
+
+-- Enable RLS
+ALTER TABLE public.custom_pages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.page_sections ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policies for custom_pages
+CREATE POLICY "Anyone can view custom_pages" ON public.custom_pages FOR SELECT USING (true);
+CREATE POLICY "Anyone can insert custom_pages" ON public.custom_pages FOR INSERT WITH CHECK (true);
+CREATE POLICY "Anyone can update custom_pages" ON public.custom_pages FOR UPDATE USING (true);
+CREATE POLICY "Anyone can delete custom_pages" ON public.custom_pages FOR DELETE USING (true);
+
+-- RLS Policies for page_sections
+CREATE POLICY "Anyone can view page_sections" ON public.page_sections FOR SELECT USING (true);
+CREATE POLICY "Anyone can insert page_sections" ON public.page_sections FOR INSERT WITH CHECK (true);
+CREATE POLICY "Anyone can update page_sections" ON public.page_sections FOR UPDATE USING (true);
+CREATE POLICY "Anyone can delete page_sections" ON public.page_sections FOR DELETE USING (true);
+
+-- Indexes for custom pages
+CREATE INDEX idx_custom_pages_branch ON public.custom_pages(branch_id);
+CREATE INDEX idx_custom_pages_slug ON public.custom_pages(slug);
+CREATE INDEX idx_page_sections_page ON public.page_sections(page_id);
+
+-- Trigger for updated_at on custom_pages
+CREATE TRIGGER update_custom_pages_updated_at BEFORE UPDATE ON public.custom_pages
+    FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
+-- ===========================================
+-- 8. SAMPLE DATA (Optional - run separately if needed)
 -- ===========================================
 
 -- Insert sample branches
@@ -212,24 +270,3 @@ INSERT INTO public.site_content (page_name, section_key, content) VALUES
     ('home', 'hero_title', 'NCS Memories'),
     ('home', 'hero_subtitle', 'Preserving moments. Celebrating journeys.'),
     ('about', 'main_content', 'NcsMemories is a digital archive dedicated to preserving the cherished moments of our school community.');
-
--- ===========================================
--- TO FIX RLS ISSUES, RUN THIS IN SUPABASE SQL EDITOR:
--- ===========================================
-/*
--- Drop old restrictive policies
-DROP POLICY IF EXISTS "Admins can insert photos" ON public.photos;
-DROP POLICY IF EXISTS "Admins can update photos" ON public.photos;
-DROP POLICY IF EXISTS "Admins can delete photos" ON public.photos;
-DROP POLICY IF EXISTS "Admins can insert collections" ON public.collections;
-DROP POLICY IF EXISTS "Admins can update collections" ON public.collections;
-DROP POLICY IF EXISTS "Admins can delete collections" ON public.collections;
-
--- Create open policies for development
-CREATE POLICY "Anyone can insert photos" ON public.photos FOR INSERT WITH CHECK (true);
-CREATE POLICY "Anyone can update photos" ON public.photos FOR UPDATE USING (true);
-CREATE POLICY "Anyone can delete photos" ON public.photos FOR DELETE USING (true);
-CREATE POLICY "Anyone can insert collections" ON public.collections FOR INSERT WITH CHECK (true);
-CREATE POLICY "Anyone can update collections" ON public.collections FOR UPDATE USING (true);
-CREATE POLICY "Anyone can delete collections" ON public.collections FOR DELETE USING (true);
-*/

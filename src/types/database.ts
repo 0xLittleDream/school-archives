@@ -92,3 +92,12 @@ export interface SiteContent {
   created_at: string;
   updated_at: string;
 }
+
+// Re-export page builder types for convenience
+export type { 
+  CustomPage, 
+  CustomPageWithBranch, 
+  PageSection, 
+  PageType, 
+  PageSectionType 
+} from './pageBuilder';
