@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
-import { useCollection, usePhotos } from '@/hooks/useDatabase';
+import { useCollection, usePhotos, useContentBlocks } from '@/hooks/useDatabase';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Calendar, MapPin, X, ChevronLeft, ChevronRight, Camera } from 'lucide-react';
@@ -11,6 +11,7 @@ const CollectionDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { data: collection, isLoading: collectionLoading } = useCollection(id || '');
   const { data: photos, isLoading: photosLoading } = usePhotos(id || '');
+  const { data: contentBlocks } = useContentBlocks(id || '');
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
 
@@ -71,7 +72,7 @@ const CollectionDetail = () => {
 
   return (
     <Layout>
-      <div className="container py-12">
+      <div className="container py-8 md:py-12">
         {/* Back button */}
         <Button variant="ghost" asChild className="mb-6 -ml-4">
           <Link to="/memories">
@@ -96,12 +97,12 @@ const CollectionDetail = () => {
             </div>
           )}
           
-          <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
+          <h1 className="font-display text-3xl md:text-5xl font-bold text-foreground mb-4">
             {collection.title}
           </h1>
           
           {collection.description && (
-            <p className="text-muted-foreground text-lg mb-4 max-w-3xl">
+            <p className="text-muted-foreground text-base md:text-lg mb-4 max-w-3xl">
               {collection.description}
             </p>
           )}
@@ -130,20 +131,59 @@ const CollectionDetail = () => {
           </div>
         </div>
 
+        {/* Content Blocks - Text sections added by teachers */}
+        {contentBlocks && contentBlocks.length > 0 && (
+          <div className="space-y-8 mb-12">
+            {contentBlocks.map((block) => (
+              <div 
+                key={block.id} 
+                className={`rounded-2xl overflow-hidden bg-card border border-border ${
+                  block.block_type === 'image_text' ? 'md:grid md:grid-cols-2' : ''
+                }`}
+              >
+                {/* Image for image_text blocks */}
+                {block.block_type === 'image_text' && block.image_url && (
+                  <div className="aspect-video md:aspect-auto overflow-hidden">
+                    <img 
+                      src={block.image_url} 
+                      alt={block.title || ''} 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+                
+                {/* Text content */}
+                <div className="p-6 md:p-8 flex flex-col justify-center">
+                  {block.title && (
+                    <h2 className="font-display text-xl md:text-2xl font-bold text-foreground mb-3">
+                      {block.title}
+                    </h2>
+                  )}
+                  {block.content && (
+                    <div className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                      {block.content}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
         {/* Photos grid */}
         {photosLoading ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
             {Array.from({ length: 8 }, (_, i) => (
-              <Skeleton key={i} className="aspect-square rounded-lg" />
+              <Skeleton key={i} className="aspect-square rounded-xl" />
             ))}
           </div>
         ) : photos && photos.length > 0 ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
             {photos.map((photo, index) => (
               <button
                 key={photo.id}
                 onClick={() => openLightbox(index)}
-                className="group relative aspect-square rounded-lg overflow-hidden bg-secondary shadow-elegant hover:shadow-elegant-lg transition-all"
+                className="group relative aspect-square rounded-xl overflow-hidden bg-secondary shadow-elegant hover:shadow-elegant-lg transition-all"
               >
                 <img
                   src={photo.image_url}

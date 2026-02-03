@@ -55,6 +55,18 @@ CREATE TABLE public.photos (
     created_at TIMESTAMPTZ DEFAULT now() NOT NULL
 );
 
+-- Content Blocks table (text sections for collections)
+CREATE TABLE public.content_blocks (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    collection_id UUID REFERENCES public.collections(id) ON DELETE CASCADE NOT NULL,
+    block_type TEXT NOT NULL DEFAULT 'text',
+    title TEXT,
+    content TEXT,
+    image_url TEXT,
+    sort_order INTEGER DEFAULT 0,
+    created_at TIMESTAMPTZ DEFAULT now() NOT NULL
+);
+
 -- Collection-Tags junction table (many-to-many)
 CREATE TABLE public.collection_tags (
     collection_id UUID REFERENCES public.collections(id) ON DELETE CASCADE NOT NULL,
@@ -94,6 +106,7 @@ ALTER TABLE public.photos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.collection_tags ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.user_roles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.site_content ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.content_blocks ENABLE ROW LEVEL SECURITY;
 
 -- ===========================================
 -- 4. RLS POLICIES (OPEN FOR DEVELOPMENT)
@@ -137,6 +150,12 @@ CREATE POLICY "Anyone can view site_content" ON public.site_content FOR SELECT U
 CREATE POLICY "Anyone can insert site_content" ON public.site_content FOR INSERT WITH CHECK (true);
 CREATE POLICY "Anyone can update site_content" ON public.site_content FOR UPDATE USING (true);
 
+-- CONTENT_BLOCKS: Public read/write for now
+CREATE POLICY "Anyone can view content_blocks" ON public.content_blocks FOR SELECT USING (true);
+CREATE POLICY "Anyone can insert content_blocks" ON public.content_blocks FOR INSERT WITH CHECK (true);
+CREATE POLICY "Anyone can update content_blocks" ON public.content_blocks FOR UPDATE USING (true);
+CREATE POLICY "Anyone can delete content_blocks" ON public.content_blocks FOR DELETE USING (true);
+
 -- ===========================================
 -- 5. INDEXES FOR PERFORMANCE
 -- ===========================================
@@ -147,6 +166,7 @@ CREATE INDEX idx_photos_collection ON public.photos(collection_id);
 CREATE INDEX idx_collection_tags_collection ON public.collection_tags(collection_id);
 CREATE INDEX idx_collection_tags_tag ON public.collection_tags(tag_id);
 CREATE INDEX idx_user_roles_user ON public.user_roles(user_id);
+CREATE INDEX idx_content_blocks_collection ON public.content_blocks(collection_id);
 
 -- ===========================================
 -- 6. TRIGGERS FOR UPDATED_AT

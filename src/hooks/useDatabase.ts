@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import type { Branch, Tag, Collection, CollectionWithTags, Photo, SiteContent } from '@/types/database';
+import type { Branch, Tag, Collection, CollectionWithTags, Photo, SiteContent, ContentBlock } from '@/types/database';
 
 // Fetch all branches
 export function useBranches() {
@@ -153,6 +153,24 @@ export function usePhotos(collectionId: string) {
       
       if (error) throw error;
       return data as Photo[];
+    },
+    enabled: !!collectionId,
+  });
+}
+
+// Fetch content blocks for a collection
+export function useContentBlocks(collectionId: string) {
+  return useQuery({
+    queryKey: ['content_blocks', collectionId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('content_blocks')
+        .select('*')
+        .eq('collection_id', collectionId)
+        .order('sort_order');
+      
+      if (error) throw error;
+      return data as ContentBlock[];
     },
     enabled: !!collectionId,
   });

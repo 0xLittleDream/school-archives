@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
-import { useCollection, usePhotos } from '@/hooks/useDatabase';
+import { useCollection, usePhotos, useContentBlocks } from '@/hooks/useDatabase';
 import { useUpdateCollection } from '@/hooks/useAdminMutations';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,18 +14,20 @@ import {
   Save,
   Eye,
   Camera,
-  Upload,
   X,
-  Check,
   Loader2,
   Plus,
   ImageIcon,
   Type,
   AlertCircle,
+  Trash2,
+  FileText,
+  Image,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
+import type { ContentBlock } from '@/types/database';
 
 const CollectionEditor = () => {
   const { id } = useParams<{ id: string }>();
@@ -33,6 +35,7 @@ const CollectionEditor = () => {
   const queryClient = useQueryClient();
   const { data: collection, isLoading } = useCollection(id || '');
   const { data: photos, isLoading: photosLoading, refetch: refetchPhotos } = usePhotos(id || '');
+  const { data: contentBlocks, refetch: refetchBlocks } = useContentBlocks(id || '');
   const updateMutation = useUpdateCollection();
 
   // Form state
@@ -44,6 +47,15 @@ const CollectionEditor = () => {
   const [isInitialized, setIsInitialized] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<string | null>(null);
 
+  // Content block editing state
+  const [editingBlock, setEditingBlock] = useState<ContentBlock | null>(null);
+  const [showAddBlock, setShowAddBlock] = useState(false);
+  const [newBlockType, setNewBlockType] = useState<'text' | 'image_text'>('text');
+  const [blockTitle, setBlockTitle] = useState('');
+  const [blockContent, setBlockContent] = useState('');
+  const [blockImage, setBlockImage] = useState('');
+  const [savingBlock, setSavingBlock] = useState(false);
+
   // Initialize form when collection loads
   useEffect(() => {
     if (collection && !isInitialized) {
@@ -54,6 +66,16 @@ const CollectionEditor = () => {
       setIsInitialized(true);
     }
   }, [collection, isInitialized]);
+
+  // Load block data when editing
+  useEffect(() => {
+    if (editingBlock) {
+      setBlockTitle(editingBlock.title || '');
+      setBlockContent(editingBlock.content || '');
+      setBlockImage(editingBlock.image_url || '');
+      setNewBlockType(editingBlock.block_type as 'text' | 'image_text');
+    }
+  }, [editingBlock]);
 
   // Handle cover image upload
   const handleCoverImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -70,6 +92,26 @@ const CollectionEditor = () => {
       const reader = new FileReader();
       reader.onloadend = () => {
         setCoverImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Handle block image upload
+  const handleBlockImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: 'File too large',
+          description: 'Please use an image under 5MB',
+          variant: 'destructive',
+        });
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setBlockImage(reader.result as string);
       };
       reader.readAsDataURL(file);
     }
@@ -112,7 +154,7 @@ const CollectionEditor = () => {
     }
   };
 
-  // Add photos to collection - FIXED with proper error handling
+  // Add photos to collection
   const handleAddPhotos = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0 || !id) return;
@@ -126,7 +168,6 @@ const CollectionEditor = () => {
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         
-        // Check file size (max 5MB per image)
         if (file.size > 5 * 1024 * 1024) {
           errorCount++;
           continue;
@@ -134,7 +175,6 @@ const CollectionEditor = () => {
 
         setUploadProgress(`Uploading ${i + 1} of ${files.length}...`);
         
-        // Read file as data URL
         const dataUrl = await new Promise<string>((resolve, reject) => {
           const reader = new FileReader();
           reader.onload = () => resolve(reader.result as string);
@@ -142,7 +182,6 @@ const CollectionEditor = () => {
           reader.readAsDataURL(file);
         });
         
-        // Insert into database
         const { error } = await supabase.from('photos').insert({
           collection_id: id,
           image_url: dataUrl,
@@ -157,7 +196,6 @@ const CollectionEditor = () => {
         }
       }
 
-      // Update photo count on collection
       if (successCount > 0) {
         await supabase
           .from('collections')
@@ -165,7 +203,6 @@ const CollectionEditor = () => {
           .eq('id', id);
       }
 
-      // Refresh data
       await refetchPhotos();
       queryClient.invalidateQueries({ queryKey: ['collection', id] });
       
@@ -185,12 +222,11 @@ const CollectionEditor = () => {
       console.error('Upload error:', error);
       toast({
         title: 'Upload Error',
-        description: error.message || 'Something went wrong. Please try again.',
+        description: error.message || 'Something went wrong.',
         variant: 'destructive',
       });
     } finally {
       setUploadProgress(null);
-      // Reset input
       e.target.value = '';
     }
   };
@@ -201,17 +237,11 @@ const CollectionEditor = () => {
     
     try {
       const { error } = await supabase.from('photos').delete().eq('id', photoId);
-      
       if (error) throw error;
       
-      // Update photo count
       const newCount = Math.max(0, (photos?.length || 1) - 1);
-      await supabase
-        .from('collections')
-        .update({ photo_count: newCount })
-        .eq('id', id);
+      await supabase.from('collections').update({ photo_count: newCount }).eq('id', id);
 
-      // Refresh data
       await refetchPhotos();
       queryClient.invalidateQueries({ queryKey: ['collection', id] });
       
@@ -224,6 +254,94 @@ const CollectionEditor = () => {
         variant: 'destructive',
       });
     }
+  };
+
+  // Save content block
+  const handleSaveBlock = async () => {
+    if (!id) return;
+    if (!blockTitle.trim() && !blockContent.trim()) {
+      toast({
+        title: 'Please add some content',
+        description: 'Add a title or text to save this block.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setSavingBlock(true);
+    try {
+      if (editingBlock) {
+        // Update existing block
+        const { error } = await supabase
+          .from('content_blocks')
+          .update({
+            title: blockTitle.trim() || null,
+            content: blockContent.trim() || null,
+            image_url: blockImage || null,
+            block_type: newBlockType,
+          })
+          .eq('id', editingBlock.id);
+        
+        if (error) throw error;
+        toast({ title: '✓ Block updated!' });
+      } else {
+        // Create new block
+        const { error } = await supabase
+          .from('content_blocks')
+          .insert({
+            collection_id: id,
+            title: blockTitle.trim() || null,
+            content: blockContent.trim() || null,
+            image_url: blockImage || null,
+            block_type: newBlockType,
+            sort_order: contentBlocks?.length || 0,
+          });
+        
+        if (error) throw error;
+        toast({ title: '✓ Block added!' });
+      }
+
+      // Reset and refresh
+      resetBlockForm();
+      await refetchBlocks();
+    } catch (error: any) {
+      console.error('Block save error:', error);
+      toast({
+        title: 'Error saving block',
+        description: error.message || 'Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setSavingBlock(false);
+    }
+  };
+
+  // Delete content block
+  const handleDeleteBlock = async (blockId: string) => {
+    try {
+      const { error } = await supabase.from('content_blocks').delete().eq('id', blockId);
+      if (error) throw error;
+      
+      await refetchBlocks();
+      toast({ title: '✓ Block removed' });
+    } catch (error: any) {
+      console.error('Delete block error:', error);
+      toast({
+        title: 'Error',
+        description: 'Could not delete block.',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  // Reset block form
+  const resetBlockForm = () => {
+    setShowAddBlock(false);
+    setEditingBlock(null);
+    setBlockTitle('');
+    setBlockContent('');
+    setBlockImage('');
+    setNewBlockType('text');
   };
 
   if (isLoading) {
@@ -253,7 +371,7 @@ const CollectionEditor = () => {
 
   return (
     <Layout>
-      {/* Simple Header */}
+      {/* Header */}
       <div className="sticky top-0 z-30 bg-background border-b border-border">
         <div className="container py-3 md:py-4">
           <div className="flex items-center justify-between gap-2">
@@ -270,17 +388,8 @@ const CollectionEditor = () => {
                   <span className="hidden sm:inline ml-2">Preview</span>
                 </Link>
               </Button>
-              <Button 
-                size="sm" 
-                onClick={handleSave} 
-                disabled={isSaving}
-                className="gap-2"
-              >
-                {isSaving ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Save className="h-4 w-4" />
-                )}
+              <Button size="sm" onClick={handleSave} disabled={isSaving} className="gap-2">
+                {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                 Save
               </Button>
             </div>
@@ -292,16 +401,13 @@ const CollectionEditor = () => {
         {/* Section 1: Basic Details */}
         <div className="bg-card rounded-2xl border border-border p-5 md:p-6 mb-6">
           <h2 className="text-lg md:text-xl font-bold mb-5 flex items-center gap-3">
-            <span className="w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">1</span>
-            Collection Details
+            <span className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">1</span>
+            Basic Info
           </h2>
 
           <div className="space-y-5">
-            {/* Title */}
             <div className="space-y-2">
-              <Label htmlFor="title" className="text-base font-medium">
-                Title *
-              </Label>
+              <Label htmlFor="title" className="text-base font-medium">Title *</Label>
               <Input
                 id="title"
                 value={title}
@@ -311,22 +417,18 @@ const CollectionEditor = () => {
               />
             </div>
 
-            {/* Description */}
             <div className="space-y-2">
-              <Label htmlFor="description" className="text-base font-medium">
-                Description
-              </Label>
+              <Label htmlFor="description" className="text-base font-medium">Short Description</Label>
               <Textarea
                 id="description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Write about this collection..."
-                rows={3}
+                placeholder="Brief summary of this collection..."
+                rows={2}
                 className="text-base rounded-xl resize-none"
               />
             </div>
 
-            {/* Featured Toggle */}
             <label className="flex items-center gap-4 p-4 rounded-xl border border-border bg-secondary/30 cursor-pointer hover:bg-secondary/50 transition-colors">
               <Checkbox
                 checked={isFeatured}
@@ -335,9 +437,7 @@ const CollectionEditor = () => {
               />
               <div>
                 <p className="font-medium">⭐ Show on Homepage</p>
-                <p className="text-sm text-muted-foreground">
-                  Feature this collection on the home page
-                </p>
+                <p className="text-sm text-muted-foreground">Feature this collection prominently</p>
               </div>
             </label>
           </div>
@@ -346,17 +446,13 @@ const CollectionEditor = () => {
         {/* Section 2: Cover Image */}
         <div className="bg-card rounded-2xl border border-border p-5 md:p-6 mb-6">
           <h2 className="text-lg md:text-xl font-bold mb-5 flex items-center gap-3">
-            <span className="w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">2</span>
+            <span className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">2</span>
             Cover Image
           </h2>
 
           {coverImage ? (
             <div className="relative rounded-xl overflow-hidden bg-secondary aspect-video">
-              <img
-                src={coverImage}
-                alt="Cover"
-                className="w-full h-full object-cover"
-              />
+              <img src={coverImage} alt="Cover" className="w-full h-full object-cover" />
               <button
                 onClick={() => setCoverImage('')}
                 className="absolute top-3 right-3 p-2 rounded-full bg-destructive text-destructive-foreground shadow-lg"
@@ -366,12 +462,7 @@ const CollectionEditor = () => {
             </div>
           ) : (
             <label className="block cursor-pointer">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleCoverImageUpload}
-                className="hidden"
-              />
+              <input type="file" accept="image/*" onChange={handleCoverImageUpload} className="hidden" />
               <div className="border-2 border-dashed border-border rounded-xl p-8 text-center hover:border-primary hover:bg-primary/5 transition-all">
                 <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-primary/10 flex items-center justify-center">
                   <ImageIcon className="h-7 w-7 text-primary" />
@@ -383,11 +474,183 @@ const CollectionEditor = () => {
           )}
         </div>
 
-        {/* Section 3: Photos */}
+        {/* Section 3: Text Sections */}
+        <div className="bg-card rounded-2xl border border-border p-5 md:p-6 mb-6">
+          <div className="flex items-center justify-between mb-5">
+            <h2 className="text-lg md:text-xl font-bold flex items-center gap-3">
+              <span className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">3</span>
+              Text Sections ({contentBlocks?.length || 0})
+            </h2>
+            
+            {!showAddBlock && !editingBlock && (
+              <Button onClick={() => setShowAddBlock(true)} className="gap-2">
+                <Plus className="h-4 w-4" />
+                Add Text
+              </Button>
+            )}
+          </div>
+
+          {/* Add/Edit Block Form */}
+          {(showAddBlock || editingBlock) && (
+            <div className="p-5 bg-secondary/30 rounded-xl border border-border mb-5">
+              <h3 className="font-semibold mb-4 flex items-center gap-2">
+                <FileText className="h-5 w-5 text-primary" />
+                {editingBlock ? 'Edit Text Section' : 'Add Text Section'}
+              </h3>
+
+              {/* Block type toggle */}
+              <div className="flex gap-2 mb-4">
+                <button
+                  onClick={() => setNewBlockType('text')}
+                  className={`flex-1 p-3 rounded-xl border-2 transition-all text-left ${
+                    newBlockType === 'text' 
+                      ? 'border-primary bg-primary/5' 
+                      : 'border-border hover:border-primary/50'
+                  }`}
+                >
+                  <Type className="h-5 w-5 mb-1 text-primary" />
+                  <p className="font-medium text-sm">Text Only</p>
+                </button>
+                <button
+                  onClick={() => setNewBlockType('image_text')}
+                  className={`flex-1 p-3 rounded-xl border-2 transition-all text-left ${
+                    newBlockType === 'image_text' 
+                      ? 'border-primary bg-primary/5' 
+                      : 'border-border hover:border-primary/50'
+                  }`}
+                >
+                  <Image className="h-5 w-5 mb-1 text-primary" />
+                  <p className="font-medium text-sm">Image + Text</p>
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <Label className="text-sm font-medium">Heading (optional)</Label>
+                  <Input
+                    value={blockTitle}
+                    onChange={(e) => setBlockTitle(e.target.value)}
+                    placeholder="e.g., About This Event"
+                    className="h-11 rounded-lg mt-1"
+                  />
+                </div>
+
+                <div>
+                  <Label className="text-sm font-medium">Text Content</Label>
+                  <Textarea
+                    value={blockContent}
+                    onChange={(e) => setBlockContent(e.target.value)}
+                    placeholder="Write your description here..."
+                    rows={4}
+                    className="rounded-lg mt-1"
+                  />
+                </div>
+
+                {newBlockType === 'image_text' && (
+                  <div>
+                    <Label className="text-sm font-medium">Image</Label>
+                    {blockImage ? (
+                      <div className="relative mt-1 rounded-lg overflow-hidden aspect-video bg-secondary">
+                        <img src={blockImage} alt="" className="w-full h-full object-cover" />
+                        <button
+                          onClick={() => setBlockImage('')}
+                          className="absolute top-2 right-2 p-1.5 rounded-full bg-destructive text-destructive-foreground"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
+                    ) : (
+                      <label className="block cursor-pointer mt-1">
+                        <input type="file" accept="image/*" onChange={handleBlockImageUpload} className="hidden" />
+                        <div className="border-2 border-dashed border-border rounded-lg p-4 text-center hover:border-primary transition-colors">
+                          <Plus className="h-6 w-6 mx-auto text-muted-foreground mb-1" />
+                          <p className="text-sm text-muted-foreground">Add image</p>
+                        </div>
+                      </label>
+                    )}
+                  </div>
+                )}
+
+                <div className="flex gap-2 pt-2">
+                  <Button onClick={handleSaveBlock} disabled={savingBlock} className="flex-1 gap-2">
+                    {savingBlock ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                    {editingBlock ? 'Update' : 'Save'}
+                  </Button>
+                  <Button variant="outline" onClick={resetBlockForm}>
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Existing blocks */}
+          {contentBlocks && contentBlocks.length > 0 ? (
+            <div className="space-y-3">
+              {contentBlocks.map((block) => (
+                <div key={block.id} className="p-4 bg-secondary/20 rounded-xl border border-border">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        {block.block_type === 'image_text' ? (
+                          <Image className="h-4 w-4 text-primary" />
+                        ) : (
+                          <Type className="h-4 w-4 text-primary" />
+                        )}
+                        <span className="text-xs font-medium text-muted-foreground uppercase">
+                          {block.block_type === 'image_text' ? 'Image + Text' : 'Text'}
+                        </span>
+                      </div>
+                      {block.title && (
+                        <h4 className="font-semibold text-foreground">{block.title}</h4>
+                      )}
+                      {block.content && (
+                        <p className="text-sm text-muted-foreground line-clamp-2 mt-1">{block.content}</p>
+                      )}
+                    </div>
+                    {block.image_url && (
+                      <div className="w-16 h-16 rounded-lg overflow-hidden bg-secondary flex-shrink-0">
+                        <img src={block.image_url} alt="" className="w-full h-full object-cover" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex gap-2 mt-3 pt-3 border-t border-border">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setEditingBlock(block)}
+                      className="flex-1"
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleDeleteBlock(block.id)}
+                      className="text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : !showAddBlock && !editingBlock && (
+            <div className="text-center py-8 bg-secondary/30 rounded-xl">
+              <FileText className="h-10 w-10 mx-auto text-muted-foreground/30 mb-3" />
+              <p className="text-muted-foreground font-medium">No text sections yet</p>
+              <p className="text-sm text-muted-foreground/70 mt-1">
+                Add descriptions or stories about this collection
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Section 4: Photos */}
         <div className="bg-card rounded-2xl border border-border p-5 md:p-6">
           <div className="flex items-center justify-between mb-5">
             <h2 className="text-lg md:text-xl font-bold flex items-center gap-3">
-              <span className="w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">3</span>
+              <span className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">4</span>
               Photos ({photos?.length || 0})
             </h2>
             
@@ -400,7 +663,7 @@ const CollectionEditor = () => {
                 className="hidden"
                 disabled={!!uploadProgress}
               />
-              <Button asChild size="default" disabled={!!uploadProgress} className="gap-2 pointer-events-none">
+              <Button asChild disabled={!!uploadProgress} className="gap-2 pointer-events-none">
                 <span>
                   {uploadProgress ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -422,10 +685,7 @@ const CollectionEditor = () => {
           ) : photos && photos.length > 0 ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {photos.map((photo, index) => (
-                <div
-                  key={photo.id}
-                  className="relative aspect-square rounded-xl overflow-hidden bg-secondary group"
-                >
+                <div key={photo.id} className="relative aspect-square rounded-xl overflow-hidden bg-secondary group">
                   <img
                     src={photo.image_url}
                     alt={photo.caption || `Photo ${index + 1}`}
@@ -447,9 +707,7 @@ const CollectionEditor = () => {
             <div className="text-center py-10 bg-secondary/30 rounded-xl">
               <Camera className="h-10 w-10 mx-auto text-muted-foreground/30 mb-3" />
               <p className="text-muted-foreground font-medium">No photos yet</p>
-              <p className="text-sm text-muted-foreground/70 mt-1">
-                Tap "Add Photos" to upload
-              </p>
+              <p className="text-sm text-muted-foreground/70 mt-1">Tap "Add Photos" to upload</p>
             </div>
           )}
         </div>
@@ -462,11 +720,7 @@ const CollectionEditor = () => {
             disabled={isSaving}
             className="gap-2 h-12 px-8 text-base rounded-xl w-full sm:w-auto"
           >
-            {isSaving ? (
-              <Loader2 className="h-5 w-5 animate-spin" />
-            ) : (
-              <Check className="h-5 w-5" />
-            )}
+            {isSaving ? <Loader2 className="h-5 w-5 animate-spin" /> : <Save className="h-5 w-5" />}
             {isSaving ? 'Saving...' : 'Save All Changes'}
           </Button>
         </div>
