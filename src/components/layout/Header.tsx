@@ -9,7 +9,6 @@ const navLinks = [
   { href: '/', label: 'Home' },
   { href: '/memories', label: 'Memories' },
   { href: '/farewell-2025', label: 'Farewell 2025' },
-  { href: '/events', label: 'Events' },
   { href: '/about', label: 'About' },
   { href: '/admin', label: 'Admin' },
 ];
