@@ -343,10 +343,22 @@ export function useCreatePageWithTemplate() {
       // Create default sections from template
       for (let i = 0; i < template.defaultSections.length; i++) {
         const section = template.defaultSections[i];
+        
+        // For quote sections, extract quote_text from metadata and put in content
+        let content = section.content;
+        if (section.section_type === 'quote' && section.metadata) {
+          const quoteMetadata = section.metadata as { quote_text?: string };
+          if (quoteMetadata.quote_text) {
+            content = quoteMetadata.quote_text;
+          }
+        }
+        
         await createSection.mutateAsync({
           page_id: page.id,
           section_type: section.section_type,
           title: section.title,
+          subtitle: section.subtitle,
+          content: content,
           metadata: section.metadata,
           sort_order: i,
         });

@@ -80,6 +80,7 @@ export interface StatsMetadata {
 }
 
 export interface QuoteMetadata {
+  quote_text?: string;
   attribution?: string;
 }
 
@@ -107,36 +108,48 @@ export interface PageTemplate {
   icon: string;
   defaultSections: Array<{
     section_type: PageSectionType;
-    title: string;
-    metadata: SectionMetadata;
+    title?: string;
+    subtitle?: string;
+    content?: string;
+    metadata?: SectionMetadata;
   }>;
 }
 
 export const PAGE_TEMPLATES: PageTemplate[] = [
   {
     id: 'farewell',
-    name: 'Farewell',
-    description: 'Perfect for graduation and farewell celebrations',
+    name: 'Farewell / Graduation',
+    description: 'Perfect for farewell ceremonies and graduation celebrations',
     icon: 'GraduationCap',
     defaultSections: [
       { 
         section_type: 'hero', 
-        title: 'Farewell 2025',
-        metadata: { badge_text: 'Class of 2025' } as HeroMetadata
+        title: 'Farewell',
+        subtitle: 'Celebrating the journey of our graduating class. Memories that will last a lifetime, friendships that will never fade.',
+        metadata: { 
+          badge_text: 'Class of 2025', 
+          title_line2: '2025',
+          event_date: 'March 2025',
+          event_location: 'School Campus'
+        } as HeroMetadata
       },
       { 
         section_type: 'quote', 
-        title: 'A Message',
-        metadata: { attribution: 'The NCS Memories Team' } as QuoteMetadata
+        title: 'A Message for the Graduating Class',
+        metadata: { 
+          quote_text: 'As you step into a new chapter of your lives, carry with you the memories, lessons, and bonds you\'ve formed here. You are not just leaving school; you are carrying a piece of it with you forever.',
+          attribution: 'The NCS Memories Team' 
+        } as QuoteMetadata
       },
       { 
         section_type: 'gallery', 
         title: 'Captured Moments',
+        subtitle: 'Photos from our farewell celebration',
         metadata: {} as GalleryMetadata
       },
       { 
         section_type: 'stats', 
-        title: 'By the Numbers',
+        title: 'Our Journey',
         metadata: { 
           stats: [
             { value: '12', label: 'Years of Journey' },
@@ -145,6 +158,12 @@ export const PAGE_TEMPLATES: PageTemplate[] = [
             { value: '♥', label: 'Endless Love' },
           ]
         } as StatsMetadata
+      },
+      { 
+        section_type: 'cta', 
+        title: 'Continue the Journey',
+        subtitle: 'Explore more memories from your school years',
+        metadata: { button_text: 'View All Memories', button_url: '/memories' } as CTAMetadata
       },
     ],
   },
