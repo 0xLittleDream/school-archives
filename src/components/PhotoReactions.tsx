@@ -73,14 +73,19 @@ export function PhotoReactions({ photoId, className }: PhotoReactionsProps) {
           <button
             key={type}
             onClick={() => handleReaction(type)}
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-full transition-all ${
+            className={`flex items-center gap-1.5 px-4 py-2.5 rounded-full transition-all duration-200 ${
               isActive 
-                ? 'bg-primary/20 text-primary scale-105' 
-                : 'bg-white/10 hover:bg-white/20 text-white'
+                ? 'bg-white text-foreground scale-110 shadow-lg ring-2 ring-primary/50' 
+                : 'bg-white/10 hover:bg-white/20 text-white hover:scale-105'
             }`}
             title={label}
           >
-            <span className="text-lg">{emoji}</span>
+            <span className={`text-xl transition-transform duration-200 ${isActive ? 'animate-pulse' : ''}`}>
+              {emoji}
+            </span>
+            {isActive && (
+              <span className="text-xs font-semibold text-primary">Liked</span>
+            )}
           </button>
         );
       })}
