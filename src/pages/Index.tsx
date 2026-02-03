@@ -118,10 +118,10 @@ const Index = () => {
                 </div>
                 <div className="space-y-4 pt-8">
                   <div className="rounded-2xl overflow-hidden shadow-elegant-lg bg-secondary aspect-square card-hover">
-                    <img src={schoolEvent} alt="School Event" className="w-full h-full object-cover" />
+                    <img alt="School Event" className="w-full h-full object-cover" src="/lovable-uploads/1a7ee739-18ad-471b-943d-1d84622758fc.jpg" />
                   </div>
                   <div className="rounded-2xl overflow-hidden shadow-elegant-lg bg-secondary aspect-[3/4] card-hover">
-                    <img src={navyDayArtwork} alt="Navy Day Student Artwork" className="w-full h-full object-cover object-center" />
+                    <img alt="Navy Day Student Artwork" className="w-full h-full object-cover object-center" src="/lovable-uploads/3e51fb81-b52e-4dbf-8d43-98a8e379a3fe.jpg" />
                   </div>
                 </div>
               </div>
