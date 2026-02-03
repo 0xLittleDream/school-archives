@@ -42,6 +42,44 @@ export interface Photo {
   created_at: string;
 }
 
+// Content Block Types
+export type ContentBlockType = 'image' | 'image_text' | 'text' | 'gallery';
+
+export interface ContentBlock {
+  id: string;
+  collection_id: string;
+  block_type: ContentBlockType;
+  title: string | null;
+  content: string | null;
+  image_url: string | null;
+  image_position: 'left' | 'right' | null;
+  gallery_images: string[] | null;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+// Event Types (for dynamic events)
+export interface Event {
+  id: string;
+  title: string;
+  description: string | null;
+  date: string | null;
+  location: string | null;
+  image_url: string | null;
+  category: string | null;
+  branch_id: string;
+  collection_id: string | null; // Link to a collection for photos
+  is_upcoming: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface EventWithBranch extends Event {
+  branch?: Branch;
+  collection?: Collection;
+}
+
 export interface UserRole {
   id: string;
   user_id: string;

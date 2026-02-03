@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -34,6 +35,7 @@ import { useToast } from '@/hooks/use-toast';
 import type { CollectionWithTags } from '@/types/database';
 
 const Admin = () => {
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [selectedBranchId, setSelectedBranchId] = useState<string>();
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -66,9 +68,16 @@ const Admin = () => {
       );
     } else {
       createMutation.mutate(data, {
-        onSuccess: () => {
-          toast({ title: 'Collection created successfully' });
+        onSuccess: (newCollection) => {
+          toast({ 
+            title: 'Collection created!',
+            description: 'Now add content to your collection.'
+          });
           setIsFormOpen(false);
+          // Navigate to collection editor after creation
+          if (newCollection?.id) {
+            navigate(`/admin/collection/${newCollection.id}`);
+          }
         },
         onError: (error: any) => {
           toast({
@@ -82,6 +91,11 @@ const Admin = () => {
   };
 
   const handleEdit = (collection: CollectionWithTags) => {
+    // Navigate to collection editor instead of opening form
+    navigate(`/admin/collection/${collection.id}`);
+  };
+
+  const handleEditMetadata = (collection: CollectionWithTags) => {
     setEditingCollection(collection);
     setIsFormOpen(true);
   };
@@ -200,6 +214,7 @@ const Admin = () => {
                     collection={collection}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
+                    onEditMetadata={handleEditMetadata}
                   />
                 ))
               ) : (
