@@ -134,8 +134,8 @@ export const PAGE_TEMPLATES: PageTemplate[] = [
         title: 'Farewell',
         subtitle: 'Celebrating the journey of our graduating class. Memories that will last a lifetime, friendships that will never fade.',
         metadata: { 
-          badge_text: 'Class of 2025', 
-          title_line2: '2025',
+          badge_text: 'Class of 2025-26', 
+          title_line2: '2025-26',
           event_date: 'March 2025',
           event_location: 'School Campus'
         } as HeroMetadata
