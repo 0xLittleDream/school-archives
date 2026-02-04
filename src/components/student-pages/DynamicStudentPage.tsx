@@ -1,4 +1,4 @@
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, Navigate } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { 
@@ -11,7 +11,8 @@ import {
   Sparkles,
   Cloud,
   ArrowRight,
-  FileX 
+  FileX,
+  Loader2
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -20,7 +21,24 @@ import type { StudentTribute } from '@/types/studentTribute';
 export const DynamicStudentPage = () => {
   const { slug } = useParams<{ slug: string }>();
   
-  const { data: student, isLoading, error } = useQuery({
+  // First check if this slug matches a custom page
+  const { data: customPage, isLoading: isLoadingPage } = useQuery({
+    queryKey: ['custom_page_check', slug],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('custom_pages')
+        .select('id, slug')
+        .eq('slug', slug)
+        .maybeSingle();
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!slug,
+  });
+  
+  // Then check for student tribute
+  const { data: student, isLoading: isLoadingStudent, error } = useQuery({
     queryKey: ['student_tribute_by_slug', slug],
     queryFn: async () => {
       const routeSlug = `/${slug}`;
@@ -33,16 +51,23 @@ export const DynamicStudentPage = () => {
       if (error) throw error;
       return data as StudentTribute | null;
     },
-    enabled: !!slug,
+    enabled: !!slug && !customPage,
   });
+
+  // If it's a custom page, redirect to the proper route
+  if (customPage) {
+    return <Navigate to={`/page/${slug}`} replace />;
+  }
+
+  const isLoading = isLoadingPage || isLoadingStudent;
 
   if (isLoading) {
     return (
       <Layout>
         <div className="min-h-[70vh] flex items-center justify-center bg-gradient-to-br from-sky-50 to-blue-100">
           <div className="text-center">
-            <Plane className="h-12 w-12 animate-bounce text-primary mx-auto mb-4" />
-            <p className="text-muted-foreground">Preparing your boarding pass...</p>
+            <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
+            <p className="text-muted-foreground">Loading...</p>
           </div>
         </div>
       </Layout>
@@ -56,14 +81,14 @@ export const DynamicStudentPage = () => {
           <div className="container py-20 text-center">
             <FileX className="h-20 w-20 mx-auto text-muted-foreground/30 mb-6" />
             <h1 className="font-display text-3xl font-bold text-foreground mb-4">
-              Flight Not Found
+              Page Not Found
             </h1>
             <p className="text-muted-foreground mb-8">
-              This boarding pass doesn't exist or the flight has departed.
+              This page doesn't exist or may have been removed.
             </p>
             <Button asChild size="lg" className="rounded-full">
-              <Link to="/farewell-2025">
-                Return to Terminal
+              <Link to="/">
+                Return Home
               </Link>
             </Button>
           </div>
