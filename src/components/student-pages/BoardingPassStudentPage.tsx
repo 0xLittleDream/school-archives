@@ -5,12 +5,11 @@ import { ArrowRight, Loader2, FileX, Heart, Plane, MapPin, Calendar, Clock } fro
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { StudentTribute } from '@/types/studentTribute';
+import { useEventSettings } from '@/hooks/useEventSettings';
 export const BoardingPassStudentPage = () => {
-  const {
-    slug
-  } = useParams<{
-    slug: string;
-  }>();
+  const { slug } = useParams<{ slug: string }>();
+  const { data: eventSettings } = useEventSettings();
+  
   const {
     data: student,
     isLoading,
@@ -77,7 +76,7 @@ export const BoardingPassStudentPage = () => {
                 textOrientation: 'mixed',
                 transform: 'rotate(180deg)'
               }}>
-                  Pass to Farewell 2025-26
+                  Pass to Farewell {eventSettings?.batch_year || '2025-26'}
                 </span>
                 <Heart className="h-5 w-5 fill-current" />
               </div>
@@ -89,11 +88,11 @@ export const BoardingPassStudentPage = () => {
                 <div className="text-center border-b-2 border-dashed border-border pb-4 mb-6">
                   <div className="flex items-center justify-center gap-2 text-primary mb-2">
                     <Plane className="h-5 w-5" />
-                    <span className="text-sm font-bold tracking-widest uppercase">NCS Airlines</span>
+                    <span className="text-sm font-bold tracking-widest uppercase">{eventSettings?.airline_name || 'NCS Airlines'}</span>
                     <Plane className="h-5 w-5 scale-x-[-1]" />
                   </div>
                   <h1 className="font-display text-lg md:text-xl text-muted-foreground tracking-wider">
-                    INVITATION TO THE VALEDICTORY CEREMONY
+                    {eventSettings?.ceremony_title || 'INVITATION TO THE VALEDICTORY CEREMONY'}
                   </h1>
                 </div>
 
@@ -112,7 +111,7 @@ export const BoardingPassStudentPage = () => {
                     </div>
                     <div className="text-center px-4 py-2 bg-primary text-primary-foreground rounded-lg">
                       <p className="text-xs uppercase opacity-80">Batch</p>
-                      <p className="font-bold text-xl">2025-26</p>
+                      <p className="font-bold text-xl">{eventSettings?.batch_year || '2025-26'}</p>
                     </div>
                   </div>
                 </div>
@@ -124,21 +123,21 @@ export const BoardingPassStudentPage = () => {
                       <Calendar className="h-3 w-3" />
                       <span className="text-xs uppercase">Date</span>
                     </div>
-                    <p className="font-semibold text-foreground">07 FEBRUARY</p>
+                    <p className="font-semibold text-foreground">{eventSettings?.event_date || '07 FEBRUARY'}</p>
                   </div>
                   <div>
                     <div className="flex items-center gap-1 text-muted-foreground mb-1">
                       <Clock className="h-3 w-3" />
                       <span className="text-xs uppercase">Time</span>
                     </div>
-                    <p className="font-semibold text-foreground">2:00 PM ONWARDS</p>
+                    <p className="font-semibold text-foreground">{eventSettings?.event_time || '2:00 PM ONWARDS'}</p>
                   </div>
                   <div className="col-span-2">
                     <div className="flex items-center gap-1 text-muted-foreground mb-1">
                       <MapPin className="h-3 w-3" />
                       <span className="text-xs uppercase">Venue</span>
                     </div>
-                    <p className="font-semibold text-foreground">NCS(SVN), ASSEMBLY AREA     </p>
+                    <p className="font-semibold text-foreground">{eventSettings?.event_venue || 'NCS(SVN), ASSEMBLY AREA'}</p>
                   </div>
                 </div>
 
@@ -226,7 +225,7 @@ export const BoardingPassStudentPage = () => {
           <div className="mt-8 text-center">
             <Button asChild variant="outline" size="lg" className="rounded-full">
               <Link to="/farewell-2025">
-                ← Back to Farewell 2025-26
+                ← Back to Farewell {eventSettings?.batch_year || '2025-26'}
               </Link>
             </Button>
           </div>
