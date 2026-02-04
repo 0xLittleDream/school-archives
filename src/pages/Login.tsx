@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,6 +14,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isSignUp, setIsSignUp] = useState(false);
   
   const { signIn } = useAuth();
   const navigate = useNavigate();
@@ -24,21 +26,57 @@ const Login = () => {
     setIsSubmitting(true);
 
     try {
-      const { error } = await signIn(email, password);
-      
-      if (error) {
-        setError(error.message);
-        toast({
-          variant: "destructive",
-          title: "Login failed",
-          description: error.message,
+      if (isSignUp) {
+        // Sign up new user
+        const { data, error: signUpError } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: window.location.origin,
+          }
         });
+        
+        if (signUpError) {
+          setError(signUpError.message);
+          toast({
+            variant: "destructive",
+            title: "Sign up failed",
+            description: signUpError.message,
+          });
+        } else if (data.user) {
+          // Create admin role for the new user
+          const { error: roleError } = await supabase
+            .from('user_roles')
+            .insert({ user_id: data.user.id, role: 'admin' });
+          
+          if (roleError) {
+            console.error('Error creating admin role:', roleError);
+          }
+          
+          toast({
+            title: "Account created!",
+            description: "Check your email to verify, or sign in if auto-confirmed.",
+          });
+          setIsSignUp(false);
+        }
       } else {
-        toast({
-          title: "Welcome back!",
-          description: "You have been logged in successfully.",
-        });
-        navigate('/admin');
+        // Sign in existing user
+        const { error } = await signIn(email, password);
+        
+        if (error) {
+          setError(error.message);
+          toast({
+            variant: "destructive",
+            title: "Login failed",
+            description: error.message,
+          });
+        } else {
+          toast({
+            title: "Welcome back!",
+            description: "You have been logged in successfully.",
+          });
+          navigate('/admin');
+        }
       }
     } catch (err) {
       setError('An unexpected error occurred');
@@ -60,9 +98,13 @@ const Login = () => {
 
         <Card className="shadow-elegant border-border/50">
           <CardHeader className="space-y-1 text-center">
-            <CardTitle className="font-display text-2xl">Sign In</CardTitle>
+            <CardTitle className="font-display text-2xl">
+              {isSignUp ? 'Create Account' : 'Sign In'}
+            </CardTitle>
             <CardDescription>
-              Enter your credentials to access the admin dashboard
+              {isSignUp 
+                ? 'Create a new admin account' 
+                : 'Enter your credentials to access the admin dashboard'}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -103,6 +145,7 @@ const Login = () => {
                     onChange={(e) => setPassword(e.target.value)}
                     className="pl-10"
                     required
+                    minLength={6}
                     disabled={isSubmitting}
                   />
                 </div>
@@ -116,13 +159,28 @@ const Login = () => {
                 {isSubmitting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Signing in...
+                    {isSignUp ? 'Creating account...' : 'Signing in...'}
                   </>
                 ) : (
-                  'Sign In'
+                  isSignUp ? 'Create Account' : 'Sign In'
                 )}
               </Button>
             </form>
+            
+            <div className="mt-4 text-center">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsSignUp(!isSignUp);
+                  setError(null);
+                }}
+                className="text-sm text-primary hover:underline"
+              >
+                {isSignUp 
+                  ? 'Already have an account? Sign in' 
+                  : "Don't have an account? Create one"}
+              </button>
+            </div>
           </CardContent>
         </Card>
 
