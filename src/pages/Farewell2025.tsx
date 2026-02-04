@@ -16,8 +16,8 @@ import { GallerySection } from '@/components/page-sections/GallerySection';
 import { StatsSection } from '@/components/page-sections/StatsSection';
 import { QuoteSection } from '@/components/page-sections/QuoteSection';
 import { CTASection } from '@/components/page-sections/CTASection';
+import { StudentDirectorySection } from '@/components/page-sections/StudentDirectorySection';
 import { StudentTributeCarousel } from '@/components/student-tributes/StudentTributeCarousel';
-import { StudentDirectory } from '@/components/student-pages/StudentDirectory';
 import type { PageSection } from '@/types/pageBuilder';
 
 // This page renders from custom_pages table with slug "farewell-2025"
@@ -180,6 +180,8 @@ const Farewell2025 = () => {
         return <QuoteSection key={section.id} section={section} />;
       case 'cta':
         return <CTASection key={section.id} section={section} />;
+      case 'student_directory':
+        return <StudentDirectorySection key={section.id} section={section} pageId={page!.id} />;
       default:
         return null;
     }
@@ -214,9 +216,6 @@ const Farewell2025 = () => {
       {studentTributes.length > 0 && heroIndex < 0 && (
         <StudentTributeCarousel tributes={studentTributes} />
       )}
-
-      {/* Student Directory - Always show on Farewell page */}
-      <StudentDirectory />
       
       {sections.length === 0 && studentTributes.length === 0 && (
         <div className="container py-20 text-center">

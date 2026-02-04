@@ -4,7 +4,8 @@ import {
   Images, 
   BarChart3, 
   Quote, 
-  MousePointerClick 
+  MousePointerClick,
+  GraduationCap
 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Card, CardContent } from '@/components/ui/card';
@@ -17,6 +18,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   BarChart3,
   Quote,
   MousePointerClick,
+  GraduationCap,
 };
 
 interface SectionPickerProps {
