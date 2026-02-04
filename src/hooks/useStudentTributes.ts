@@ -43,10 +43,13 @@ export function useCreateStudentTribute() {
         .insert({
           page_id: pageId,
           student_name: data.student_name,
+          full_name: data.full_name || null,
           photo_url: data.photo_url || null,
           quote: data.quote || null,
           future_dreams: data.future_dreams || null,
           class_section: data.class_section || null,
+          traits: data.traits || [],
+          route_slug: data.route_slug || null,
           sort_order: nextOrder,
         })
         .select()

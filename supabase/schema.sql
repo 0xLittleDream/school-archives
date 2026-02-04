@@ -274,10 +274,13 @@ CREATE TABLE public.student_tributes (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     page_id UUID REFERENCES public.custom_pages(id) ON DELETE CASCADE NOT NULL,
     student_name TEXT NOT NULL,
+    full_name TEXT,
     photo_url TEXT,
     quote TEXT,
     future_dreams TEXT,
     class_section TEXT,
+    traits TEXT[] DEFAULT '{}',
+    route_slug TEXT,
     sort_order INTEGER DEFAULT 0,
     created_at TIMESTAMPTZ DEFAULT now() NOT NULL,
     updated_at TIMESTAMPTZ DEFAULT now() NOT NULL
@@ -299,8 +302,21 @@ CREATE INDEX idx_student_tributes_page ON public.student_tributes(page_id);
 CREATE TRIGGER update_student_tributes_updated_at BEFORE UPDATE ON public.student_tributes
     FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
+-- Index for route_slug lookups
+CREATE INDEX idx_student_tributes_route ON public.student_tributes(route_slug);
+
 -- Insert sample site content
 INSERT INTO public.site_content (page_name, section_key, content) VALUES
     ('home', 'hero_title', 'NCS Memories'),
     ('home', 'hero_subtitle', 'Preserving moments. Celebrating journeys.'),
     ('about', 'main_content', 'NcsMemories is a digital archive dedicated to preserving the cherished moments of our school community.');
+
+-- ===========================================
+-- 10. MIGRATION: Add new columns if table exists
+-- Run this separately if you already have the student_tributes table
+-- ===========================================
+-- ALTER TABLE public.student_tributes ADD COLUMN IF NOT EXISTS full_name TEXT;
+-- ALTER TABLE public.student_tributes ADD COLUMN IF NOT EXISTS traits TEXT[] DEFAULT '{}';
+-- ALTER TABLE public.student_tributes ADD COLUMN IF NOT EXISTS route_slug TEXT;
+-- CREATE INDEX IF NOT EXISTS idx_student_tributes_route ON public.student_tributes(route_slug);
+-- NOTIFY pgrst, 'reload schema';
