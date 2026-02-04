@@ -19,7 +19,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Upload, FolderOpen, FileEdit, Plus, Settings, Shield } from 'lucide-react';
+import { Upload, FolderOpen, FileEdit, Plus, Settings, Shield, GraduationCap } from 'lucide-react';
 import { useCollections } from '@/hooks/useDatabase';
 import {
   useCreateCollection,
@@ -31,6 +31,7 @@ import { CollectionForm } from '@/components/admin/CollectionForm';
 import { BranchSelector } from '@/components/admin/BranchSelector';
 import { PhotoUploader } from '@/components/admin/PhotoUploader';
 import { PageEditor } from '@/components/admin/PageEditor';
+import { StudentPagesManager } from '@/components/admin/StudentPagesManager';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import type { CollectionWithTags } from '@/types/database';
@@ -172,6 +173,10 @@ const Admin = () => {
               <FileEdit className="h-4 w-4" />
               Page Editor
             </TabsTrigger>
+            <TabsTrigger value="students" className="gap-2 px-4 py-2.5">
+              <GraduationCap className="h-4 w-4" />
+              Students
+            </TabsTrigger>
           </TabsList>
 
           {/* Collections Tab */}
@@ -246,6 +251,11 @@ const Admin = () => {
           {/* Page Editor Tab */}
           <TabsContent value="pages">
             <PageEditor />
+          </TabsContent>
+
+          {/* Student Pages Tab */}
+          <TabsContent value="students">
+            <StudentPagesManager />
           </TabsContent>
         </Tabs>
       </div>

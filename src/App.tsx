@@ -37,6 +37,7 @@ import Deveshi2025 from "./pages/students/Deveshi2025";
 import Madhuri2025 from "./pages/students/Madhuri2025";
 import Sahithi2025 from "./pages/students/Sahithi2025";
 import Deepika2025 from "./pages/students/Deepika2025";
+import Abhinay2025 from "./pages/students/Abhinay2025";
 
 const queryClient = new QueryClient();
 
@@ -77,6 +78,7 @@ const App = () => (
               <Route path="/Madhuri2025" element={<Madhuri2025 />} />
               <Route path="/Sahithi2025" element={<Sahithi2025 />} />
               <Route path="/Deepika2025" element={<Deepika2025 />} />
+              <Route path="/Abhinay2025" element={<Abhinay2025 />} />
               
               {/* Admin Routes - Protected */}
               <Route path="/admin" element={
