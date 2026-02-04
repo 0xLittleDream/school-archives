@@ -291,16 +291,19 @@ export function StudentTributeManager({ pageId }: StudentTributeManagerProps) {
                   />
                 </div>
 
-                {/* Future Dreams */}
+                {/* School Description */}
                 <div className="space-y-2">
-                  <Label htmlFor="future_dreams">Future Dreams / Aspirations</Label>
+                  <Label htmlFor="future_dreams">About This Student</Label>
                   <Textarea
                     id="future_dreams"
                     value={formData.future_dreams}
                     onChange={(e) => setFormData({ ...formData, future_dreams: e.target.value })}
-                    placeholder="What does this student aspire to become?"
-                    rows={2}
+                    placeholder="Write a short description about this student from the school's perspective..."
+                    rows={4}
                   />
+                  <p className="text-xs text-muted-foreground">
+                    A heartfelt message or description written by the school about this student
+                  </p>
                 </div>
 
                 <div className="flex justify-end gap-3 pt-4 border-t">
