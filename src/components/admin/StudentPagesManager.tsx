@@ -88,8 +88,8 @@ export function StudentPagesManager() {
   const handleSave = async () => {
     if (!page?.id) {
       toast({
-        title: 'No Farewell Page',
-        description: 'Please create a Farewell 2025 page first.',
+        title: 'No Event Page',
+        description: 'Please create an event page first to add students.',
         variant: 'destructive',
       });
       return;
@@ -161,14 +161,14 @@ export function StudentPagesManager() {
               <GraduationCap className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <CardTitle className="text-xl">Student Tribute Pages</CardTitle>
-              <p className="text-sm text-muted-foreground">Manage Class of 2025 student pages</p>
+              <CardTitle className="text-xl">Student Pages</CardTitle>
+              <p className="text-sm text-muted-foreground">Manage student tribute pages</p>
             </div>
           </div>
         </CardHeader>
         <CardContent>
           <div className="p-6 text-center text-muted-foreground">
-            <p>Please create a Farewell 2025 page first to manage students.</p>
+            <p>Please create an event page first to manage students.</p>
           </div>
         </CardContent>
       </Card>
@@ -183,8 +183,8 @@ export function StudentPagesManager() {
             <GraduationCap className="h-5 w-5 text-primary" />
           </div>
           <div>
-            <CardTitle className="text-xl">Student Tribute Pages</CardTitle>
-            <p className="text-sm text-muted-foreground">Manage Class of 2025 student pages</p>
+            <CardTitle className="text-xl">Student Pages</CardTitle>
+            <p className="text-sm text-muted-foreground">Manage student tribute pages</p>
           </div>
         </div>
         <Button onClick={handleAddNew} className="gap-2">

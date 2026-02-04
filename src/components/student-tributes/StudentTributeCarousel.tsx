@@ -61,13 +61,13 @@ export function StudentTributeCarousel({
         {/* Section Header */}
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-4">
-            <span className="text-sm font-semibold text-primary">🎓 Our Graduates</span>
+            <span className="text-sm font-semibold text-primary">🎓 Our Students</span>
           </div>
           <h2 className="font-display text-3xl md:text-5xl font-bold text-foreground mb-4">
-            Meet the <span className="text-gradient">Class of 2025</span>
+            Meet the <span className="text-gradient">Stars</span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Celebrating the journeys, dreams, and bright futures of our graduating students
+            Celebrating the journeys, dreams, and bright futures of our students
           </p>
         </div>
 
