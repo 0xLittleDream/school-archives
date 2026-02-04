@@ -41,9 +41,6 @@ const App = () => (
               <Route path="/collection/:id" element={<CollectionDetail />} />
               <Route path="/page/:slug" element={<CustomPage />} />
               
-              {/* Dynamic Student Tribute Pages - Celebration Theme */}
-              <Route path="/:slug" element={<DynamicStudentPage />} />
-              
               {/* Admin Routes - Protected */}
               <Route path="/admin" element={
                 <ProtectedRoute requireAdmin>
@@ -61,7 +58,10 @@ const App = () => (
                 </ProtectedRoute>
               } />
               
-              {/* Catch-all */}
+              {/* Dynamic Student Tribute Pages */}
+              <Route path="/:slug" element={<DynamicStudentPage />} />
+              
+              {/* Catch-all - Must be last */}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
