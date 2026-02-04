@@ -22,6 +22,12 @@ const CustomPage = () => {
   const { selectedBranchId, selectedBranch } = useBranch();
   const { data: page, isLoading } = useCustomPage(slug || '', selectedBranchId || undefined);
 
+  // Fetch student tributes for farewell pages - must be called unconditionally
+  const isFarewell = page?.page_type === 'farewell';
+  const { data: studentTributes = [] } = useStudentTributes(
+    isFarewell ? page?.id : undefined
+  );
+
   if (isLoading) {
     return (
       <Layout>
@@ -84,11 +90,6 @@ const CustomPage = () => {
   }
 
   const sections = page.sections || [];
-  
-  // Fetch student tributes for farewell pages
-  const { data: studentTributes = [] } = useStudentTributes(
-    page.page_type === 'farewell' ? page.id : undefined
-  );
 
   const renderSection = (section: PageSection, index: number) => {
     switch (section.section_type) {
