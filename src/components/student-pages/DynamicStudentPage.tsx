@@ -54,14 +54,27 @@ export const DynamicStudentPage = () => {
     enabled: !!slug && !customPage,
   });
 
+  // Show loading while checking page type
+  if (isLoadingPage) {
+    return (
+      <Layout>
+        <div className="min-h-[70vh] flex items-center justify-center bg-gradient-to-br from-sky-50 to-blue-100">
+          <div className="text-center">
+            <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
+            <p className="text-muted-foreground">Loading...</p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
   // If it's a custom page, redirect to the proper route
   if (customPage) {
     return <Navigate to={`/page/${slug}`} replace />;
   }
 
-  const isLoading = isLoadingPage || isLoadingStudent;
-
-  if (isLoading) {
+  // Show loading while checking student tribute
+  if (isLoadingStudent) {
     return (
       <Layout>
         <div className="min-h-[70vh] flex items-center justify-center bg-gradient-to-br from-sky-50 to-blue-100">
