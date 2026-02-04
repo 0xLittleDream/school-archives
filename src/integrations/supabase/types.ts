@@ -14,7 +14,469 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      branches: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          location: string | null
+          name: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          location?: string | null
+          name: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          location?: string | null
+          name?: string
+        }
+        Relationships: []
+      }
+      collection_tags: {
+        Row: {
+          collection_id: string
+          id: string
+          tag_id: string
+        }
+        Insert: {
+          collection_id: string
+          id?: string
+          tag_id: string
+        }
+        Update: {
+          collection_id?: string
+          id?: string
+          tag_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collection_tags_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "collections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collection_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      collections: {
+        Row: {
+          branch_id: string | null
+          cover_image_url: string | null
+          created_at: string
+          description: string | null
+          event_date: string | null
+          id: string
+          is_featured: boolean | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          branch_id?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          description?: string | null
+          event_date?: string | null
+          id?: string
+          is_featured?: boolean | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          branch_id?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          description?: string | null
+          event_date?: string | null
+          id?: string
+          is_featured?: boolean | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collections_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      content_blocks: {
+        Row: {
+          block_key: string
+          content: string | null
+          created_at: string
+          id: string
+          metadata: Json | null
+          page_key: string
+          updated_at: string
+        }
+        Insert: {
+          block_key: string
+          content?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          page_key: string
+          updated_at?: string
+        }
+        Update: {
+          block_key?: string
+          content?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          page_key?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      custom_pages: {
+        Row: {
+          branch_id: string | null
+          cover_image_url: string | null
+          created_at: string
+          id: string
+          is_published: boolean | null
+          meta_description: string | null
+          page_type: string
+          slug: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          branch_id?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          id?: string
+          is_published?: boolean | null
+          meta_description?: string | null
+          page_type?: string
+          slug: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          branch_id?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          id?: string
+          is_published?: boolean | null
+          meta_description?: string | null
+          page_type?: string
+          slug?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "custom_pages_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      page_sections: {
+        Row: {
+          content: string | null
+          created_at: string
+          id: string
+          image_url: string | null
+          metadata: Json | null
+          page_id: string
+          section_type: string
+          sort_order: number | null
+          subtitle: string | null
+          title: string | null
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          metadata?: Json | null
+          page_id: string
+          section_type: string
+          sort_order?: number | null
+          subtitle?: string | null
+          title?: string | null
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          metadata?: Json | null
+          page_id?: string
+          section_type?: string
+          sort_order?: number | null
+          subtitle?: string | null
+          title?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "page_sections_page_id_fkey"
+            columns: ["page_id"]
+            isOneToOne: false
+            referencedRelation: "custom_pages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      photo_comments: {
+        Row: {
+          author_name: string | null
+          content: string
+          created_at: string
+          id: string
+          photo_id: string
+          user_id: string | null
+        }
+        Insert: {
+          author_name?: string | null
+          content: string
+          created_at?: string
+          id?: string
+          photo_id: string
+          user_id?: string | null
+        }
+        Update: {
+          author_name?: string | null
+          content?: string
+          created_at?: string
+          id?: string
+          photo_id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "photo_comments_photo_id_fkey"
+            columns: ["photo_id"]
+            isOneToOne: false
+            referencedRelation: "photos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      photo_reactions: {
+        Row: {
+          created_at: string
+          id: string
+          photo_id: string
+          reaction_type: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          photo_id: string
+          reaction_type: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          photo_id?: string
+          reaction_type?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "photo_reactions_photo_id_fkey"
+            columns: ["photo_id"]
+            isOneToOne: false
+            referencedRelation: "photos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      photos: {
+        Row: {
+          caption: string | null
+          collection_id: string
+          created_at: string
+          id: string
+          image_url: string
+          sort_order: number | null
+        }
+        Insert: {
+          caption?: string | null
+          collection_id: string
+          created_at?: string
+          id?: string
+          image_url: string
+          sort_order?: number | null
+        }
+        Update: {
+          caption?: string | null
+          collection_id?: string
+          created_at?: string
+          id?: string
+          image_url?: string
+          sort_order?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "photos_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "collections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      site_content: {
+        Row: {
+          content_key: string
+          content_type: string | null
+          content_value: string | null
+          created_at: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          content_key: string
+          content_type?: string | null
+          content_value?: string | null
+          created_at?: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          content_key?: string
+          content_type?: string | null
+          content_value?: string | null
+          created_at?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      student_tributes: {
+        Row: {
+          class_section: string | null
+          created_at: string
+          full_name: string | null
+          future_dreams: string | null
+          id: string
+          page_id: string
+          photo_url: string | null
+          quote: string | null
+          route_slug: string | null
+          sort_order: number | null
+          student_name: string
+          traits: string[] | null
+          updated_at: string
+        }
+        Insert: {
+          class_section?: string | null
+          created_at?: string
+          full_name?: string | null
+          future_dreams?: string | null
+          id?: string
+          page_id: string
+          photo_url?: string | null
+          quote?: string | null
+          route_slug?: string | null
+          sort_order?: number | null
+          student_name: string
+          traits?: string[] | null
+          updated_at?: string
+        }
+        Update: {
+          class_section?: string | null
+          created_at?: string
+          full_name?: string | null
+          future_dreams?: string | null
+          id?: string
+          page_id?: string
+          photo_url?: string | null
+          quote?: string | null
+          route_slug?: string | null
+          sort_order?: number | null
+          student_name?: string
+          traits?: string[] | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_tributes_page_id_fkey"
+            columns: ["page_id"]
+            isOneToOne: false
+            referencedRelation: "custom_pages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tags: {
+        Row: {
+          color: string | null
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          branch_id: string | null
+          created_at: string
+          id: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          branch_id?: string | null
+          created_at?: string
+          id?: string
+          role?: string
+          user_id: string
+        }
+        Update: {
+          branch_id?: string | null
+          created_at?: string
+          id?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_roles_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
