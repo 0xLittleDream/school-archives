@@ -252,7 +252,10 @@ export function PageEditor() {
                     <Button 
                       variant="ghost" 
                       size="icon"
-                      onClick={() => window.open(`/page/${page.slug}`, '_blank')}
+                      onClick={() => {
+                        const previewUrl = page.slug === 'farewell-2025' ? '/farewell-2025' : `/page/${page.slug}`;
+                        window.open(previewUrl, '_blank');
+                      }}
                     >
                       <ExternalLink className="h-4 w-4" />
                     </Button>

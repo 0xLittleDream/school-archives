@@ -209,7 +209,11 @@ export function PageBuilderEditor() {
           <Button 
             variant="outline" 
             className="gap-2"
-            onClick={() => window.open(`/page/${page.slug}`, '_blank')}
+            onClick={() => {
+              // Special routes for known page types
+              const previewUrl = page.slug === 'farewell-2025' ? '/farewell-2025' : `/page/${page.slug}`;
+              window.open(previewUrl, '_blank');
+            }}
           >
             <Eye className="h-4 w-4" />
             Preview
