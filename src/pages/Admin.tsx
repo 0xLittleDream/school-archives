@@ -19,7 +19,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Upload, FolderOpen, FileEdit, Plus, Settings, Shield, GraduationCap, Plane } from 'lucide-react';
+import { Upload, FolderOpen, FileEdit, Plus, Settings, Shield, GraduationCap, Settings2 } from 'lucide-react';
 import { useCollections } from '@/hooks/useDatabase';
 import {
   useCreateCollection,
@@ -32,7 +32,7 @@ import { BranchSelector } from '@/components/admin/BranchSelector';
 import { PhotoUploader } from '@/components/admin/PhotoUploader';
 import { PageEditor } from '@/components/admin/PageEditor';
 import { StudentPagesManager } from '@/components/admin/StudentPagesManager';
-import { EventSettingsManager } from '@/components/admin/EventSettingsManager';
+import { SiteSettingsManager } from '@/components/admin/SiteSettingsManager';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import type { CollectionWithTags } from '@/types/database';
@@ -151,8 +151,7 @@ const Admin = () => {
               <div className="text-sm">
                 <p className="font-medium mb-1">Note: Row Level Security</p>
                 <p className="opacity-80">
-                  To create/edit/delete collections, you need to be authenticated as an admin. 
-                  Run the SQL in the Supabase dashboard to add temporary public access or set up proper authentication.
+                  To create/edit/delete collections, you need to be authenticated as an admin.
                 </p>
               </div>
             </div>
@@ -161,7 +160,7 @@ const Admin = () => {
 
         {/* Tabs */}
         <Tabs defaultValue="collections" className="space-y-8">
-          <TabsList className="bg-secondary/50 p-1.5 h-auto">
+          <TabsList className="bg-secondary/50 p-1.5 h-auto flex-wrap">
             <TabsTrigger value="collections" className="gap-2 px-4 py-2.5">
               <FolderOpen className="h-4 w-4" />
               Collections
@@ -178,9 +177,9 @@ const Admin = () => {
               <GraduationCap className="h-4 w-4" />
               Students
             </TabsTrigger>
-            <TabsTrigger value="event-settings" className="gap-2 px-4 py-2.5">
-              <Plane className="h-4 w-4" />
-              Event Settings
+            <TabsTrigger value="site-settings" className="gap-2 px-4 py-2.5">
+              <Settings2 className="h-4 w-4" />
+              Site Settings
             </TabsTrigger>
           </TabsList>
 
@@ -263,9 +262,9 @@ const Admin = () => {
             <StudentPagesManager />
           </TabsContent>
 
-          {/* Event Settings Tab */}
-          <TabsContent value="event-settings">
-            <EventSettingsManager />
+          {/* Site Settings Tab */}
+          <TabsContent value="site-settings">
+            <SiteSettingsManager />
           </TabsContent>
         </Tabs>
       </div>

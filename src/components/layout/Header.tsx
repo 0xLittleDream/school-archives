@@ -5,12 +5,22 @@ import { Button } from '@/components/ui/button';
 import { BranchIndicator } from './BranchIndicator';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
-const navLinks = [
-  { href: '/', label: 'Home' },
-  { href: '/memories', label: 'Memories' },
-  { href: '/farewell-2025', label: 'Farewell 2025' },
-  { href: '/about', label: 'About' },
+interface NavItem {
+  id: string;
+  label: string;
+  href: string;
+  isVisible: boolean;
+  order: number;
+}
+
+// Default navigation (used when no settings saved)
+const DEFAULT_NAV: NavItem[] = [
+  { id: 'home', label: 'Home', href: '/', isVisible: true, order: 0 },
+  { id: 'memories', label: 'Memories', href: '/memories', isVisible: true, order: 1 },
+  { id: 'about', label: 'About', href: '/about', isVisible: true, order: 2 },
 ];
 
 export function Header() {
@@ -18,6 +28,27 @@ export function Header() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, isAdmin, signOut } = useAuth();
+
+  // Fetch navigation settings
+  const { data: navSettings } = useQuery({
+    queryKey: ['site_settings', 'site_navigation'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('site_content')
+        .select('content_value')
+        .eq('content_key', 'site_navigation')
+        .maybeSingle();
+      
+      if (error) throw error;
+      return data?.content_value ? JSON.parse(data.content_value) : null;
+    },
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+  });
+
+  // Use saved nav items or defaults
+  const navLinks = (navSettings?.navItems || DEFAULT_NAV)
+    .filter((item: NavItem) => item.isVisible)
+    .sort((a: NavItem, b: NavItem) => a.order - b.order);
 
   const isActive = (href: string) => {
     if (href === '/') return location.pathname === '/';
@@ -46,9 +77,9 @@ export function Header() {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-1">
-          {navLinks.map((link) => (
+          {navLinks.map((link: NavItem) => (
             <Link
-              key={link.href}
+              key={link.id}
               to={link.href}
               className={cn(
                 'px-4 py-2 text-sm font-medium rounded-md transition-colors',
@@ -116,9 +147,9 @@ export function Header() {
             <div className="px-4 py-2 mb-2">
               <BranchIndicator />
             </div>
-            {navLinks.map((link) => (
+            {navLinks.map((link: NavItem) => (
               <Link
-                key={link.href}
+                key={link.id}
                 to={link.href}
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={cn(

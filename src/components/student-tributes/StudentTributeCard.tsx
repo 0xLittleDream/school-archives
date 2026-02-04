@@ -34,7 +34,7 @@ export function StudentTributeCard({ tribute, isActive = false }: StudentTribute
             className="text-[9px] md:text-[10px] font-bold tracking-widest uppercase whitespace-nowrap"
             style={{ writingMode: 'vertical-rl', textOrientation: 'mixed', transform: 'rotate(180deg)' }}
           >
-            Class of 2025-26
+            NCS Airways
           </span>
           <Heart className="h-4 w-4 fill-current mt-2" />
         </div>
@@ -76,9 +76,11 @@ export function StudentTributeCard({ tribute, isActive = false }: StudentTribute
               )}
               
               {/* Batch Badge */}
-              <div className="inline-block mt-2 px-3 py-1 bg-primary text-primary-foreground text-xs font-bold rounded">
-                2025-26
-              </div>
+              {tribute.class_section && (
+                <div className="inline-block mt-2 px-3 py-1 bg-primary text-primary-foreground text-xs font-bold rounded">
+                  {tribute.class_section}
+                </div>
+              )}
             </div>
           </div>
 
