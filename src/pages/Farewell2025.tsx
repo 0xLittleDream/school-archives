@@ -28,6 +28,9 @@ const Farewell2025 = () => {
   const { selectedBranchId, selectedBranch } = useBranch();
   const { data: page, isLoading, refetch } = useCustomPage('farewell-2025', selectedBranchId || undefined);
   const createPageWithTemplate = useCreatePageWithTemplate();
+  
+  // Move hook to top level - hooks must not be called conditionally
+  const { data: studentTributes = [] } = useStudentTributes(page?.id);
 
   // If no farewell page exists for this branch, show option to create one
   const handleCreateFarewellPage = async () => {
@@ -162,9 +165,6 @@ const Farewell2025 = () => {
   }
 
   const sections = page.sections || [];
-  
-  // Fetch student tributes for this farewell page
-  const { data: studentTributes = [] } = useStudentTributes(page.id);
 
   const renderSection = (section: PageSection, index: number) => {
     switch (section.section_type) {
