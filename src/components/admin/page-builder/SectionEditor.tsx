@@ -12,6 +12,7 @@ import { GallerySectionForm } from './sections/GallerySectionForm';
 import { StatsSectionForm } from './sections/StatsSectionForm';
 import { QuoteSectionForm } from './sections/QuoteSectionForm';
 import { CTASectionForm } from './sections/CTASectionForm';
+import { StudentDirectorySectionForm } from './sections/StudentDirectorySectionForm';
 
 interface SectionEditorProps {
   section: PageSection | null;
@@ -28,6 +29,7 @@ const SECTION_TITLES: Record<string, string> = {
   quote: 'Quote Block',
   cta: 'Call to Action',
   info_card: 'Info Cards',
+  student_directory: 'Student Directory',
 };
 
 export function SectionEditor({ section, open, onOpenChange, onSaved }: SectionEditorProps) {
@@ -88,6 +90,8 @@ export function SectionEditor({ section, open, onOpenChange, onSaved }: SectionE
         return <QuoteSectionForm section={editedSection} onChange={handleChange} />;
       case 'cta':
         return <CTASectionForm section={editedSection} onChange={handleChange} />;
+      case 'student_directory':
+        return <StudentDirectorySectionForm section={editedSection} onChange={handleChange} />;
       default:
         return <div className="text-muted-foreground">Unknown section type</div>;
     }

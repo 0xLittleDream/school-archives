@@ -22,7 +22,8 @@ import {
   BarChart3,
   Quote,
   MousePointerClick,
-  Pencil
+  Pencil,
+  GraduationCap
 } from 'lucide-react';
 import { 
   useCustomPageById, 
@@ -45,6 +46,7 @@ const sectionIcons: Record<string, React.ComponentType<{ className?: string }>> 
   stats: BarChart3,
   quote: Quote,
   cta: MousePointerClick,
+  student_directory: GraduationCap,
 };
 
 const sectionLabels: Record<string, string> = {
@@ -54,6 +56,7 @@ const sectionLabels: Record<string, string> = {
   stats: 'Statistics',
   quote: 'Quote',
   cta: 'Call to Action',
+  student_directory: 'Student Directory',
 };
 
 export function PageBuilderEditor() {

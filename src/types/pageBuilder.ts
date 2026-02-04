@@ -9,7 +9,8 @@ export type PageSectionType =
   | 'gallery' 
   | 'stats' 
   | 'quote' 
-  | 'cta';
+  | 'cta'
+  | 'student_directory';
 
 export interface CustomPage {
   id: string;
@@ -90,6 +91,11 @@ export interface CTAMetadata {
   variant?: 'primary' | 'secondary' | 'outline';
 }
 
+export interface StudentDirectoryMetadata {
+  show_photos?: boolean;
+  columns?: number;
+}
+
 export type SectionMetadata = 
   | HeroMetadata 
   | InfoCardMetadata 
@@ -98,6 +104,7 @@ export type SectionMetadata =
   | StatsMetadata 
   | QuoteMetadata 
   | CTAMetadata
+  | StudentDirectoryMetadata
   | Record<string, unknown>;
 
 // Template definitions
@@ -271,5 +278,11 @@ export const SECTION_TYPES: SectionTypeDefinition[] = [
     name: 'Call to Action',
     description: 'Button that links to another page',
     icon: 'MousePointerClick',
+  },
+  {
+    type: 'student_directory',
+    name: 'Student Directory',
+    description: 'Grid of graduating students with links to their pages',
+    icon: 'GraduationCap',
   },
 ];
