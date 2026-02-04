@@ -368,6 +368,86 @@ export type Database = {
         }
         Relationships: []
       }
+      student_achievements: {
+        Row: {
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: string
+          sort_order: number | null
+          student_id: string
+          title: string
+          year: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          sort_order?: number | null
+          student_id: string
+          title: string
+          year?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          sort_order?: number | null
+          student_id?: string
+          title?: string
+          year?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_achievements_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "student_tributes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      student_event_assignments: {
+        Row: {
+          created_at: string
+          id: string
+          page_id: string
+          sort_order: number | null
+          student_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          page_id: string
+          sort_order?: number | null
+          student_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          page_id?: string
+          sort_order?: number | null
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_event_assignments_page_id_fkey"
+            columns: ["page_id"]
+            isOneToOne: false
+            referencedRelation: "custom_pages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "student_event_assignments_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "student_tributes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       student_tributes: {
         Row: {
           class_section: string | null
@@ -381,6 +461,7 @@ export type Database = {
           route_slug: string | null
           sort_order: number | null
           student_name: string
+          theme: string | null
           traits: string[] | null
           updated_at: string
         }
@@ -396,6 +477,7 @@ export type Database = {
           route_slug?: string | null
           sort_order?: number | null
           student_name: string
+          theme?: string | null
           traits?: string[] | null
           updated_at?: string
         }
@@ -411,6 +493,7 @@ export type Database = {
           route_slug?: string | null
           sort_order?: number | null
           student_name?: string
+          theme?: string | null
           traits?: string[] | null
           updated_at?: string
         }

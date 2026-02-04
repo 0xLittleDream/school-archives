@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Trash2, Edit2, GraduationCap, Users, X, Save } from 'lucide-react';
+import { Plus, Trash2, Edit2, GraduationCap, Users, X, Save, Trophy, Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -24,6 +24,13 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { ImageUploader } from '@/components/admin/ImageUploader';
 import { 
@@ -32,10 +39,41 @@ import {
   useUpdateStudentTribute, 
   useDeleteStudentTribute 
 } from '@/hooks/useStudentTributes';
-import type { StudentTribute, StudentTributeFormData } from '@/types/studentTribute';
+import { 
+  useStudentAchievements, 
+  useCreateAchievement, 
+  useDeleteAchievement 
+} from '@/hooks/useStudentAchievements';
+import type { StudentTribute, StudentTributeFormData, StudentTheme, THEME_OPTIONS, ACHIEVEMENT_ICONS } from '@/types/studentTribute';
+
+// Import theme options
+const themeOptions: typeof THEME_OPTIONS = [
+  { value: 'playful', label: '🎉 Playful', description: 'Bright colors, confetti, fun animations', colors: 'from-pink-500 via-purple-500 to-indigo-500' },
+  { value: 'navy', label: '⚓ Navy', description: 'NCS Airways flight theme', colors: 'from-blue-600 via-blue-700 to-blue-800' },
+  { value: 'army', label: '🎖️ Army', description: 'Camouflage accents, medal-style badges', colors: 'from-green-700 via-green-800 to-green-900' },
+  { value: 'classic', label: '🎓 Classic', description: 'Formal graduation style with gold accents', colors: 'from-amber-600 via-yellow-600 to-amber-700' },
+];
+
+const achievementIcons = [
+  { value: 'trophy', label: '🏆 Trophy' },
+  { value: 'medal', label: '🏅 Medal' },
+  { value: 'star', label: '⭐ Star' },
+  { value: 'certificate', label: '📜 Certificate' },
+  { value: 'book', label: '📚 Academic' },
+  { value: 'sports', label: '⚽ Sports' },
+  { value: 'music', label: '🎵 Music' },
+  { value: 'art', label: '🎨 Art' },
+];
 
 interface StudentTributeManagerProps {
   pageId: string;
+}
+
+interface AchievementFormState {
+  title: string;
+  description: string;
+  icon: string;
+  year: string;
 }
 
 export function StudentTributeManager({ pageId }: StudentTributeManagerProps) {
@@ -44,10 +82,12 @@ export function StudentTributeManager({ pageId }: StudentTributeManagerProps) {
   const createTribute = useCreateStudentTribute();
   const updateTribute = useUpdateStudentTribute();
   const deleteTribute = useDeleteStudentTribute();
+  const createAchievement = useCreateAchievement();
+  const deleteAchievement = useDeleteAchievement();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingTribute, setEditingTribute] = useState<StudentTribute | null>(null);
-  const [formData, setFormData] = useState<StudentTributeFormData>({
+  const [formData, setFormData] = useState<StudentTributeFormData & { theme: StudentTheme }>({
     student_name: '',
     full_name: '',
     photo_url: '',
@@ -56,6 +96,16 @@ export function StudentTributeManager({ pageId }: StudentTributeManagerProps) {
     class_section: '',
     traits: ['', '', ''],
     route_slug: '',
+    theme: 'playful',
+  });
+
+  // Achievement management for editing student
+  const { data: achievements = [] } = useStudentAchievements(editingTribute?.id);
+  const [newAchievement, setNewAchievement] = useState<AchievementFormState>({
+    title: '',
+    description: '',
+    icon: 'trophy',
+    year: '',
   });
 
   const resetForm = () => {
@@ -68,8 +118,10 @@ export function StudentTributeManager({ pageId }: StudentTributeManagerProps) {
       class_section: '',
       traits: ['', '', ''],
       route_slug: '',
+      theme: 'playful',
     });
     setEditingTribute(null);
+    setNewAchievement({ title: '', description: '', icon: 'trophy', year: '' });
   };
 
   const handleOpenDialog = (tribute?: StudentTribute) => {
@@ -85,6 +137,7 @@ export function StudentTributeManager({ pageId }: StudentTributeManagerProps) {
         class_section: tribute.class_section || '',
         traits: [...traits, '', '', ''].slice(0, 3),
         route_slug: tribute.route_slug || '',
+        theme: tribute.theme || 'playful',
       });
     } else {
       resetForm();
@@ -101,6 +154,35 @@ export function StudentTributeManager({ pageId }: StudentTributeManagerProps) {
     const newTraits = [...(formData.traits || ['', '', ''])];
     newTraits[index] = value;
     setFormData({ ...formData, traits: newTraits });
+  };
+
+  const handleAddAchievement = async () => {
+    if (!editingTribute || !newAchievement.title.trim()) return;
+    
+    try {
+      await createAchievement.mutateAsync({
+        studentId: editingTribute.id,
+        data: newAchievement,
+      });
+      setNewAchievement({ title: '', description: '', icon: 'trophy', year: '' });
+      toast({ title: '✓ Achievement added!' });
+    } catch (error: any) {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    }
+  };
+
+  const handleDeleteAchievement = async (achievementId: string) => {
+    if (!editingTribute) return;
+    
+    try {
+      await deleteAchievement.mutateAsync({
+        id: achievementId,
+        studentId: editingTribute.id,
+      });
+      toast({ title: '✓ Achievement removed' });
+    } catch (error: any) {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -160,6 +242,16 @@ export function StudentTributeManager({ pageId }: StudentTributeManagerProps) {
     }
   };
 
+  const getThemeBadgeClass = (theme: StudentTheme) => {
+    switch (theme) {
+      case 'playful': return 'bg-pink-100 text-pink-700';
+      case 'navy': return 'bg-blue-100 text-blue-700';
+      case 'army': return 'bg-green-100 text-green-700';
+      case 'classic': return 'bg-amber-100 text-amber-700';
+      default: return 'bg-muted text-muted-foreground';
+    }
+  };
+
   if (isLoading) {
     return (
       <Card>
@@ -209,6 +301,36 @@ export function StudentTributeManager({ pageId }: StudentTributeManagerProps) {
                     value={formData.photo_url}
                     onChange={(url) => setFormData({ ...formData, photo_url: url })}
                   />
+                </div>
+
+                {/* Theme Selection */}
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-2">
+                    <Palette className="h-4 w-4" />
+                    Page Theme
+                  </Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {themeOptions.map((theme) => (
+                      <button
+                        key={theme.value}
+                        type="button"
+                        onClick={() => setFormData({ ...formData, theme: theme.value })}
+                        className={`
+                          p-3 rounded-lg border-2 text-left transition-all
+                          ${formData.theme === theme.value 
+                            ? 'border-primary bg-primary/5 ring-2 ring-primary/20' 
+                            : 'border-border hover:border-primary/50'
+                          }
+                        `}
+                      >
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-lg">{theme.label.split(' ')[0]}</span>
+                          <span className="font-semibold text-sm">{theme.label.split(' ').slice(1).join(' ')}</span>
+                        </div>
+                        <p className="text-xs text-muted-foreground">{theme.description}</p>
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
                 {/* Name Fields */}
@@ -306,6 +428,90 @@ export function StudentTributeManager({ pageId }: StudentTributeManagerProps) {
                   </p>
                 </div>
 
+                {/* Achievements Section - Only when editing */}
+                {editingTribute && (
+                  <div className="space-y-4 p-4 bg-muted/30 rounded-lg border">
+                    <Label className="flex items-center gap-2 text-base font-semibold">
+                      <Trophy className="h-4 w-4" />
+                      Achievements & Awards
+                    </Label>
+                    
+                    {/* Existing achievements */}
+                    {achievements.length > 0 && (
+                      <div className="space-y-2">
+                        {achievements.map((ach) => (
+                          <div key={ach.id} className="flex items-center gap-2 p-2 bg-background rounded-lg border">
+                            <span className="text-lg">
+                              {achievementIcons.find(i => i.value === ach.icon)?.label.split(' ')[0] || '🏆'}
+                            </span>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-sm truncate">{ach.title}</p>
+                              {ach.year && <p className="text-xs text-muted-foreground">{ach.year}</p>}
+                            </div>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDeleteAchievement(ach.id)}
+                              className="text-destructive hover:text-destructive"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    
+                    {/* Add new achievement */}
+                    <div className="grid grid-cols-[auto_1fr_auto_auto] gap-2 items-end">
+                      <div className="space-y-1">
+                        <Label className="text-xs">Icon</Label>
+                        <Select
+                          value={newAchievement.icon}
+                          onValueChange={(v) => setNewAchievement({ ...newAchievement, icon: v })}
+                        >
+                          <SelectTrigger className="w-[80px]">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {achievementIcons.map((icon) => (
+                              <SelectItem key={icon.value} value={icon.value}>
+                                {icon.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs">Title</Label>
+                        <Input
+                          value={newAchievement.title}
+                          onChange={(e) => setNewAchievement({ ...newAchievement, title: e.target.value })}
+                          placeholder="e.g., Science Fair Winner"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs">Year</Label>
+                        <Input
+                          value={newAchievement.year}
+                          onChange={(e) => setNewAchievement({ ...newAchievement, year: e.target.value })}
+                          placeholder="2024"
+                          className="w-[80px]"
+                        />
+                      </div>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        onClick={handleAddAchievement}
+                        disabled={!newAchievement.title.trim() || createAchievement.isPending}
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex justify-end gap-3 pt-4 border-t">
                   <Button type="button" variant="outline" onClick={handleCloseDialog}>
                     <X className="h-4 w-4 mr-2" />
@@ -330,7 +536,7 @@ export function StudentTributeManager({ pageId }: StudentTributeManagerProps) {
             <GraduationCap className="h-12 w-12 mx-auto text-muted-foreground/40 mb-4" />
             <h3 className="font-semibold text-foreground mb-2">No students added yet</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Add student tributes to showcase on the Farewell page
+              Add student tributes to showcase on event pages
             </p>
             <Button variant="outline" onClick={() => handleOpenDialog()}>
               <Plus className="h-4 w-4 mr-2" />
@@ -368,6 +574,9 @@ export function StudentTributeManager({ pageId }: StudentTributeManagerProps) {
                     {tribute.class_section && (
                       <p className="text-sm text-muted-foreground">{tribute.class_section}</p>
                     )}
+                    <Badge className={`mt-1 text-xs ${getThemeBadgeClass(tribute.theme || 'playful')}`}>
+                      {themeOptions.find(t => t.value === (tribute.theme || 'playful'))?.label || 'Playful'}
+                    </Badge>
                   </div>
                 </div>
 
