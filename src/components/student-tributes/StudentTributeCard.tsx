@@ -69,15 +69,15 @@ export function StudentTributeCard({ tribute, isActive = false }: StudentTribute
             </div>
           )}
 
-          {/* Future Dreams */}
+          {/* School's Words */}
           {tribute.future_dreams && (
             <div className="mt-4 p-4 rounded-xl bg-gradient-to-r from-primary/5 via-accent/5 to-primary/5 border border-primary/10">
               <div className="flex items-center justify-center gap-2 text-primary mb-2">
                 <Sparkles className="w-4 h-4" />
-                <span className="text-xs font-semibold uppercase tracking-wider">Future Dreams</span>
+                <span className="text-xs font-semibold uppercase tracking-wider">From the School</span>
                 <Sparkles className="w-4 h-4" />
               </div>
-              <p className="text-foreground font-medium text-sm md:text-base">
+              <p className="text-muted-foreground text-sm md:text-base leading-relaxed">
                 {tribute.future_dreams}
               </p>
             </div>

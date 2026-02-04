@@ -114,17 +114,26 @@ export const DynamicStudentPage = () => {
             <p className="text-lg text-muted-foreground italic">
               {student.quote || "Every ending is a new beginning. Wishing you all the success in your future endeavors!"}
             </p>
-            {student.future_dreams && (
-              <p className="mt-4 text-foreground">
-                <strong>Future Dreams:</strong> {student.future_dreams}
-              </p>
-            )}
             <div className="mt-6 flex items-center justify-center gap-2 text-primary">
               <Sparkles className="h-4 w-4" />
               <span className="text-sm font-medium">Best wishes from NCS Family</span>
               <Sparkles className="h-4 w-4" />
             </div>
           </div>
+
+          {/* School's Description */}
+          {student.future_dreams && (
+            <div className="max-w-2xl mx-auto mt-8 p-8 rounded-2xl bg-gradient-to-br from-primary/5 to-accent/5 border border-primary/10">
+              <div className="flex items-center justify-center gap-2 text-primary mb-4">
+                <Sparkles className="h-4 w-4" />
+                <span className="text-sm font-semibold uppercase tracking-wider">From the School</span>
+                <Sparkles className="h-4 w-4" />
+              </div>
+              <p className="text-foreground leading-relaxed text-center">
+                {student.future_dreams}
+              </p>
+            </div>
+          )}
 
           {/* Back button */}
           <div className="mt-12">
