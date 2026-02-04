@@ -226,7 +226,7 @@ const Memories = () => {
                   <p className="text-white/70 text-xs md:text-sm flex items-center gap-2">
                     <span className="flex items-center gap-1">
                       <Camera className="h-3 w-3" />
-                      {collection.photo_count}
+                      Photos
                     </span>
                     {collection.event_date && (
                       <span className="flex items-center gap-1">

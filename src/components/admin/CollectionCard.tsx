@@ -157,7 +157,7 @@ export function CollectionCard({ collection, onEdit, onDelete, onEditMetadata }:
         
         <div className="flex items-center justify-between mt-4 pt-3 border-t border-border">
           <span className="text-sm text-muted-foreground">
-            📸 {collection.photo_count} photos
+            📸 Collection
           </span>
           {collection.branch && (
             <span className="text-xs text-primary font-semibold bg-primary/10 px-2 py-1 rounded-full">

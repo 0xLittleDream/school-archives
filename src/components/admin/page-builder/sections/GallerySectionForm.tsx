@@ -57,7 +57,7 @@ export function GallerySectionForm({ section, onChange }: GallerySectionFormProp
             <SelectItem value="none">No collection linked</SelectItem>
             {collections?.map((collection) => (
               <SelectItem key={collection.id} value={collection.id}>
-                {collection.title} ({collection.photo_count} photos)
+                {collection.title}
               </SelectItem>
             ))}
           </SelectContent>
@@ -84,7 +84,7 @@ export function GallerySectionForm({ section, onChange }: GallerySectionFormProp
             <div>
               <p className="font-medium text-foreground">{selectedCollection.title}</p>
               <p className="text-sm text-muted-foreground">
-                {selectedCollection.photo_count} photos will be shown
+                Photos from this collection will be shown
               </p>
             </div>
           </div>

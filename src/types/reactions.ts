@@ -11,11 +11,10 @@ export interface PhotoReaction {
 export interface PhotoComment {
   id: string;
   photo_id: string;
-  user_id: string;
+  user_id: string | null;
+  author_name: string | null;
   content: string;
   created_at: string;
-  updated_at: string;
-  user_email?: string;
 }
 
 export interface ReactionCount {
