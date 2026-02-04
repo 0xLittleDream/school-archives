@@ -58,10 +58,12 @@ export function useCustomPage(slug: string, branchId?: string) {
       if (error) throw error;
       
       if (data) {
-        // Sort sections by sort_order
-        data.sections = (data.sections || []).sort((a: PageSection, b: PageSection) => 
-          a.sort_order - b.sort_order
-        );
+        // Sort sections by sort_order and cast to PageSection
+        const sections = (data.sections || []) as unknown as PageSection[];
+        return {
+          ...data,
+          sections: sections.sort((a, b) => a.sort_order - b.sort_order)
+        } as CustomPageWithBranch;
       }
       
       return data as CustomPageWithBranch | null;
@@ -88,9 +90,12 @@ export function useCustomPageById(id: string) {
       if (error) throw error;
       
       if (data) {
-        data.sections = (data.sections || []).sort((a: PageSection, b: PageSection) => 
-          a.sort_order - b.sort_order
-        );
+        // Sort sections by sort_order and cast to PageSection
+        const sections = (data.sections || []) as unknown as PageSection[];
+        return {
+          ...data,
+          sections: sections.sort((a, b) => a.sort_order - b.sort_order)
+        } as CustomPageWithBranch;
       }
       
       return data as CustomPageWithBranch | null;
@@ -154,31 +159,22 @@ export function useCreateCustomPage() {
   
   return useMutation({
     mutationFn: async (data: CreatePageData) => {
-      // Build insert object dynamically to avoid schema cache issues with null fields
-      const insertData: Record<string, unknown> = {
-        title: data.title,
-        slug: data.slug,
-        page_type: data.page_type,
-        branch_id: data.branch_id,
-        is_published: false,
-      };
-      
-      // Only include optional fields if they have values
-      if (data.cover_image_url) {
-        insertData.cover_image_url = data.cover_image_url;
-      }
-      if (data.meta_description) {
-        insertData.meta_description = data.meta_description;
-      }
-      
       const { data: result, error } = await supabase
         .from('custom_pages')
-        .insert(insertData)
+        .insert({
+          title: data.title,
+          slug: data.slug,
+          page_type: data.page_type,
+          branch_id: data.branch_id,
+          cover_image_url: data.cover_image_url || null,
+          meta_description: data.meta_description || null,
+          is_published: false,
+        })
         .select()
         .single();
       
       if (error) throw error;
-      return result as CustomPage;
+      return result as unknown as CustomPage;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['custom_pages'] });
@@ -239,23 +235,25 @@ export function useCreatePageSection() {
   
   return useMutation({
     mutationFn: async (data: CreateSectionData) => {
+      const insertObj = {
+        page_id: data.page_id,
+        section_type: data.section_type,
+        title: data.title || null,
+        subtitle: data.subtitle || null,
+        content: data.content || null,
+        image_url: data.image_url || null,
+        metadata: (data.metadata as Record<string, unknown>) || {},
+        sort_order: data.sort_order ?? 0,
+      };
+      
       const { data: result, error } = await supabase
         .from('page_sections')
-        .insert({
-          page_id: data.page_id,
-          section_type: data.section_type,
-          title: data.title || null,
-          subtitle: data.subtitle || null,
-          content: data.content || null,
-          image_url: data.image_url || null,
-          metadata: data.metadata || {},
-          sort_order: data.sort_order ?? 0,
-        })
+        .insert(insertObj as any)
         .select()
         .single();
       
       if (error) throw error;
-      return result as PageSection;
+      return result as unknown as PageSection;
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['page_sections', variables.page_id] });
@@ -270,15 +268,24 @@ export function useUpdatePageSection() {
   
   return useMutation({
     mutationFn: async ({ id, ...data }: UpdateSectionData) => {
+      const updateData: Record<string, unknown> = {};
+      if (data.section_type !== undefined) updateData.section_type = data.section_type;
+      if (data.title !== undefined) updateData.title = data.title;
+      if (data.subtitle !== undefined) updateData.subtitle = data.subtitle;
+      if (data.content !== undefined) updateData.content = data.content;
+      if (data.image_url !== undefined) updateData.image_url = data.image_url;
+      if (data.metadata !== undefined) updateData.metadata = data.metadata as Record<string, unknown>;
+      if (data.sort_order !== undefined) updateData.sort_order = data.sort_order;
+      
       const { data: result, error } = await supabase
         .from('page_sections')
-        .update(data)
+        .update(updateData)
         .eq('id', id)
         .select()
         .single();
       
       if (error) throw error;
-      return result as PageSection;
+      return result as unknown as PageSection;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['page_sections', data.page_id] });

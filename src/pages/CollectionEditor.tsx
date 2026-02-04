@@ -196,13 +196,6 @@ const CollectionEditor = () => {
         }
       }
 
-      if (successCount > 0) {
-        await supabase
-          .from('collections')
-          .update({ photo_count: currentPhotoCount + successCount })
-          .eq('id', id);
-      }
-
       await refetchPhotos();
       queryClient.invalidateQueries({ queryKey: ['collection', id] });
       
@@ -238,9 +231,6 @@ const CollectionEditor = () => {
     try {
       const { error } = await supabase.from('photos').delete().eq('id', photoId);
       if (error) throw error;
-      
-      const newCount = Math.max(0, (photos?.length || 1) - 1);
-      await supabase.from('collections').update({ photo_count: newCount }).eq('id', id);
 
       await refetchPhotos();
       queryClient.invalidateQueries({ queryKey: ['collection', id] });
@@ -285,20 +275,15 @@ const CollectionEditor = () => {
         if (error) throw error;
         toast({ title: '✓ Block updated!' });
       } else {
-        // Create new block
-        const { error } = await supabase
-          .from('content_blocks')
-          .insert({
-            collection_id: id,
-            title: blockTitle.trim() || null,
-            content: blockContent.trim() || null,
-            image_url: blockImage || null,
-            block_type: newBlockType,
-            sort_order: contentBlocks?.length || 0,
-          });
-        
-        if (error) throw error;
-        toast({ title: '✓ Block added!' });
+        // Create new block - Note: content_blocks table schema doesn't support collection-based blocks
+        // This feature is temporarily disabled until database schema is updated
+        toast({ 
+          title: 'Feature unavailable', 
+          description: 'Content blocks are not available for collections at this time.',
+          variant: 'destructive' 
+        });
+        setSavingBlock(false);
+        return;
       }
 
       // Reset and refresh

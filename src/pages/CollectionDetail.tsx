@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
-import { useCollection, usePhotos, useContentBlocks } from '@/hooks/useDatabase';
+import { useCollection, usePhotos } from '@/hooks/useDatabase';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Calendar, MapPin, X, ChevronLeft, ChevronRight, Camera, Star, Download } from 'lucide-react';
@@ -14,7 +14,6 @@ const CollectionDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { data: collection, isLoading: collectionLoading } = useCollection(id || '');
   const { data: photos, isLoading: photosLoading } = usePhotos(id || '');
-  const { data: contentBlocks } = useContentBlocks(id || '');
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
 
@@ -166,7 +165,7 @@ const CollectionDetail = () => {
                   )}
                   <span className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary">
                     <Camera className="h-4 w-4 text-primary" />
-                    {collection.photo_count} photos
+                    Photos
                   </span>
                 </div>
                 <ShareButtons title={collection.title} />
@@ -177,60 +176,6 @@ const CollectionDetail = () => {
       </section>
 
       <div className="container py-8 md:py-12">
-        {/* Content Blocks - Text sections added by teachers */}
-        {contentBlocks && contentBlocks.length > 0 && (
-          <div className="space-y-10 mb-16">
-            {contentBlocks.map((block, index) => (
-              <div 
-                key={block.id} 
-                className="animate-fade-in"
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                {block.block_type === 'image_text' && block.image_url ? (
-                  <div className={`grid md:grid-cols-2 gap-8 items-center ${
-                    index % 2 === 1 ? '' : ''
-                  }`}>
-                    <div className={`rounded-2xl overflow-hidden shadow-elegant-lg ${
-                      index % 2 === 1 ? 'md:order-2' : ''
-                    }`}>
-                      <img 
-                        src={block.image_url} 
-                        alt={block.title || ''} 
-                        className="w-full h-64 md:h-80 object-cover"
-                      />
-                    </div>
-                    <div className={index % 2 === 1 ? 'md:order-1' : ''}>
-                      {block.title && (
-                        <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground mb-4">
-                          {block.title}
-                        </h2>
-                      )}
-                      {block.content && (
-                        <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap text-lg">
-                          {block.content}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="bg-gradient-to-br from-primary/5 to-accent/5 rounded-2xl p-8 border border-border">
-                    {block.title && (
-                      <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground mb-4">
-                        {block.title}
-                      </h2>
-                    )}
-                    {block.content && (
-                      <p className="text-muted-foreground text-lg leading-relaxed whitespace-pre-wrap">
-                        {block.content}
-                      </p>
-                    )}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-
         {/* Photo Gallery Header */}
         <div className="flex items-center justify-between mb-6">
           <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground">

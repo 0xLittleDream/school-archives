@@ -257,8 +257,7 @@ const Index = () => {
                       {collection.title}
                     </h3>
                     <p className="text-white/70 text-sm">
-                      {collection.photo_count} photos
-                      {collection.event_date && ` • ${new Date(collection.event_date).toLocaleDateString('en-US', {
+                      {collection.event_date && `${new Date(collection.event_date).toLocaleDateString('en-US', {
                   month: 'short',
                   year: 'numeric'
                 })}`}
