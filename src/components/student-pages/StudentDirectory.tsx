@@ -26,6 +26,7 @@ const students: Student[] = [
   { name: "Madhuri", fullName: "A. Madhuri", traits: ["Eccentric", "Fearless", "Memorable"], route: "/Madhuri2025" },
   { name: "Sahithi", fullName: "K. Sahithi", traits: ["Reliable", "Composed", "Sincere"], route: "/Sahithi2025" },
   { name: "Deepika", fullName: "Deepika Srivastava", traits: ["Gentle", "Nostalgic", "Graceful"], route: "/Deepika2025" },
+  { name: "Abhinay", fullName: "Abhinay Chaudhary", traits: ["Polished", "Confident", "Courteous"], route: "/Abhinay2025" },
 ];
 
 export const StudentDirectory = () => {
