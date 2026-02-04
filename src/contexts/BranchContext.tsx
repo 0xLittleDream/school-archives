@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import type { Branch } from '@/types/database';
 
 interface BranchContextType {
@@ -17,18 +18,37 @@ export function BranchProvider({ children }: { children: ReactNode }) {
   const [selectedBranch, setSelectedBranchState] = useState<Branch | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load from localStorage on mount
+  // Load from localStorage on mount and validate it still exists
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      try {
-        const branch = JSON.parse(stored) as Branch;
-        setSelectedBranchState(branch);
-      } catch {
-        localStorage.removeItem(STORAGE_KEY);
+    const validateAndLoad = async () => {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        try {
+          const branch = JSON.parse(stored) as Branch;
+          
+          // Validate the stored branch still exists in the database
+          const { data, error } = await supabase
+            .from('branches')
+            .select('id, name, code, location')
+            .eq('id', branch.id)
+            .maybeSingle();
+          
+          if (error || !data) {
+            // Branch no longer exists, clear it so modal shows again
+            console.log('Stored branch no longer exists, clearing...');
+            localStorage.removeItem(STORAGE_KEY);
+          } else {
+            // Update with fresh data from database
+            setSelectedBranchState(data as Branch);
+          }
+        } catch {
+          localStorage.removeItem(STORAGE_KEY);
+        }
       }
-    }
-    setIsLoading(false);
+      setIsLoading(false);
+    };
+    
+    validateAndLoad();
   }, []);
 
   const setSelectedBranch = (branch: Branch) => {
