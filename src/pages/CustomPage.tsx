@@ -6,6 +6,7 @@ import { ArrowLeft, FileX } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useCustomPage } from '@/hooks/usePageBuilder';
 import { useBranch } from '@/contexts/BranchContext';
+import { useStudentTributes } from '@/hooks/useStudentTributes';
 
 import { HeroSection } from '@/components/page-sections/HeroSection';
 import { TextBlockSection } from '@/components/page-sections/TextBlockSection';
@@ -13,6 +14,7 @@ import { GallerySection } from '@/components/page-sections/GallerySection';
 import { StatsSection } from '@/components/page-sections/StatsSection';
 import { QuoteSection } from '@/components/page-sections/QuoteSection';
 import { CTASection } from '@/components/page-sections/CTASection';
+import { StudentTributeCarousel } from '@/components/student-tributes/StudentTributeCarousel';
 import type { PageSection } from '@/types/pageBuilder';
 
 const CustomPage = () => {
@@ -82,6 +84,11 @@ const CustomPage = () => {
   }
 
   const sections = page.sections || [];
+  
+  // Fetch student tributes for farewell pages
+  const { data: studentTributes = [] } = useStudentTributes(
+    page.page_type === 'farewell' ? page.id : undefined
+  );
 
   const renderSection = (section: PageSection, index: number) => {
     switch (section.section_type) {
@@ -102,10 +109,36 @@ const CustomPage = () => {
     }
   };
 
+  // Find hero section index to insert student tributes after it
+  const heroIndex = sections.findIndex(s => s.section_type === 'hero');
+  const hasQuoteSection = sections.some(s => s.section_type === 'quote');
+
   return (
     <Layout>
-      {/* SEO Meta (would need helmet for full implementation) */}
-      {sections.map((section, index) => renderSection(section, index))}
+      {sections.map((section, index) => {
+        const sectionElement = renderSection(section, index);
+        
+        // Insert student tributes carousel after hero (or after quote if exists right after hero)
+        const insertAfterHero = heroIndex >= 0 && index === heroIndex;
+        const insertAfterQuote = hasQuoteSection && section.section_type === 'quote' && index === heroIndex + 1;
+        
+        const shouldInsertTributes = page.page_type === 'farewell' && studentTributes.length > 0 && 
+          (insertAfterQuote || (insertAfterHero && !hasQuoteSection));
+        
+        return (
+          <div key={section.id}>
+            {sectionElement}
+            {shouldInsertTributes && (
+              <StudentTributeCarousel tributes={studentTributes} />
+            )}
+          </div>
+        );
+      })}
+
+      {/* Fallback for farewell pages - show tributes at the end */}
+      {page.page_type === 'farewell' && studentTributes.length > 0 && heroIndex < 0 && (
+        <StudentTributeCarousel tributes={studentTributes} />
+      )}
       
       {sections.length === 0 && (
         <div className="container py-20 text-center">

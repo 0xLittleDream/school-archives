@@ -35,6 +35,7 @@ import { useToast } from '@/hooks/use-toast';
 import { SectionPicker } from './SectionPicker';
 import { SectionEditor } from './SectionEditor';
 import { ImageUploader } from '@/components/admin/ImageUploader';
+import { StudentTributeManager } from '@/components/admin/StudentTributeManager';
 import type { PageSection, PageSectionType } from '@/types/pageBuilder';
 
 const sectionIcons: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -384,6 +385,11 @@ export function PageBuilderEditor() {
           )}
         </CardContent>
       </Card>
+
+      {/* Student Tributes Manager (only for farewell pages) */}
+      {page.page_type === 'farewell' && (
+        <StudentTributeManager pageId={page.id} />
+      )}
 
       {/* Section Picker Modal */}
       <SectionPicker

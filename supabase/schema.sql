@@ -265,6 +265,40 @@ INSERT INTO public.tags (name, color) VALUES
     ('Sports', '#22c55e'),
     ('Achievements', '#3b82f6');
 
+-- ===========================================
+-- 9. STUDENT TRIBUTES TABLE
+-- ===========================================
+
+-- Student Tributes table (for farewell pages)
+CREATE TABLE public.student_tributes (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    page_id UUID REFERENCES public.custom_pages(id) ON DELETE CASCADE NOT NULL,
+    student_name TEXT NOT NULL,
+    photo_url TEXT,
+    quote TEXT,
+    future_dreams TEXT,
+    class_section TEXT,
+    sort_order INTEGER DEFAULT 0,
+    created_at TIMESTAMPTZ DEFAULT now() NOT NULL,
+    updated_at TIMESTAMPTZ DEFAULT now() NOT NULL
+);
+
+-- Enable RLS
+ALTER TABLE public.student_tributes ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policies for student_tributes
+CREATE POLICY "Anyone can view student_tributes" ON public.student_tributes FOR SELECT USING (true);
+CREATE POLICY "Anyone can insert student_tributes" ON public.student_tributes FOR INSERT WITH CHECK (true);
+CREATE POLICY "Anyone can update student_tributes" ON public.student_tributes FOR UPDATE USING (true);
+CREATE POLICY "Anyone can delete student_tributes" ON public.student_tributes FOR DELETE USING (true);
+
+-- Index for performance
+CREATE INDEX idx_student_tributes_page ON public.student_tributes(page_id);
+
+-- Trigger for updated_at
+CREATE TRIGGER update_student_tributes_updated_at BEFORE UPDATE ON public.student_tributes
+    FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
 -- Insert sample site content
 INSERT INTO public.site_content (page_name, section_key, content) VALUES
     ('home', 'hero_title', 'NCS Memories'),
