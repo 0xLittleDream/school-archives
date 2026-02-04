@@ -19,7 +19,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Upload, FolderOpen, FileEdit, Plus, Settings, Shield, GraduationCap } from 'lucide-react';
+import { Upload, FolderOpen, FileEdit, Plus, Settings, Shield, GraduationCap, Plane } from 'lucide-react';
 import { useCollections } from '@/hooks/useDatabase';
 import {
   useCreateCollection,
@@ -32,6 +32,7 @@ import { BranchSelector } from '@/components/admin/BranchSelector';
 import { PhotoUploader } from '@/components/admin/PhotoUploader';
 import { PageEditor } from '@/components/admin/PageEditor';
 import { StudentPagesManager } from '@/components/admin/StudentPagesManager';
+import { EventSettingsManager } from '@/components/admin/EventSettingsManager';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import type { CollectionWithTags } from '@/types/database';
@@ -177,6 +178,10 @@ const Admin = () => {
               <GraduationCap className="h-4 w-4" />
               Students
             </TabsTrigger>
+            <TabsTrigger value="event-settings" className="gap-2 px-4 py-2.5">
+              <Plane className="h-4 w-4" />
+              Event Settings
+            </TabsTrigger>
           </TabsList>
 
           {/* Collections Tab */}
@@ -256,6 +261,11 @@ const Admin = () => {
           {/* Student Pages Tab */}
           <TabsContent value="students">
             <StudentPagesManager />
+          </TabsContent>
+
+          {/* Event Settings Tab */}
+          <TabsContent value="event-settings">
+            <EventSettingsManager />
           </TabsContent>
         </Tabs>
       </div>
