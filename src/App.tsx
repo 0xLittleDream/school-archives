@@ -18,7 +18,7 @@ import CollectionEditor from "./pages/CollectionEditor";
 import CustomPage from "./pages/CustomPage";
 import PageBuilderEditorPage from "./pages/PageBuilderEditorPage";
 import NotFound from "./pages/NotFound";
-import { BoardingPassStudentPage } from "@/components/student-pages/BoardingPassStudentPage";
+import { DynamicStudentPage } from "@/components/student-pages/DynamicStudentPage";
 
 const queryClient = new QueryClient();
 
@@ -41,8 +41,8 @@ const App = () => (
               <Route path="/collection/:id" element={<CollectionDetail />} />
               <Route path="/page/:slug" element={<CustomPage />} />
               
-              {/* Dynamic Student Tribute Pages - Boarding Pass Theme */}
-              <Route path="/:slug" element={<BoardingPassStudentPage />} />
+              {/* Dynamic Student Tribute Pages - Celebration Theme */}
+              <Route path="/:slug" element={<DynamicStudentPage />} />
               
               {/* Admin Routes - Protected */}
               <Route path="/admin" element={
