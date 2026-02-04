@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { ChevronLeft, ChevronRight, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { StudentTributeCard } from './StudentTributeCard';
+import { PlayfulStudentCard } from './PlayfulStudentCard';
 import type { StudentTribute } from '@/types/studentTribute';
 
 interface StudentTributeCarouselProps {
@@ -100,17 +101,22 @@ export function StudentTributeCarousel({
               className="flex transition-transform duration-500 ease-out"
               style={{ transform: `translateX(-${currentIndex * 100}%)` }}
             >
-              {tributes.map((tribute, index) => (
-                <div 
-                  key={tribute.id} 
-                  className="w-full flex-shrink-0 px-4"
-                >
-                  <StudentTributeCard 
-                    tribute={tribute} 
-                    isActive={index === currentIndex}
-                  />
-                </div>
-              ))}
+              {tributes.map((tribute, index) => {
+                // Render the correct theme card
+                const CardComponent = tribute.theme === 'navy' ? StudentTributeCard : PlayfulStudentCard;
+                
+                return (
+                  <div 
+                    key={tribute.id} 
+                    className="w-full flex-shrink-0 px-4"
+                  >
+                    <CardComponent 
+                      tribute={tribute} 
+                      isActive={index === currentIndex}
+                    />
+                  </div>
+                );
+              })}
             </div>
           </div>
 

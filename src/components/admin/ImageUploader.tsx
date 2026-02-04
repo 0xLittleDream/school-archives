@@ -15,7 +15,8 @@ export function ImageUploader({ value, onChange, className }: ImageUploaderProps
   const [isDragging, setIsDragging] = useState(false);
   const [urlInput, setUrlInput] = useState(value || '');
   const [previewUrl, setPreviewUrl] = useState(value || '');
-  const [activeTab, setActiveTab] = useState<string>(value?.startsWith('data:') ? 'upload' : 'url');
+  // Prioritize upload tab - only show URL tab if explicitly using a URL
+  const [activeTab, setActiveTab] = useState<string>('upload');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = useCallback((file: File) => {

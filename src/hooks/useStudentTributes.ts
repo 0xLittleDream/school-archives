@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import type { StudentTribute, StudentTributeFormData } from '@/types/studentTribute';
+import type { StudentTribute, StudentTributeFormData, StudentTheme } from '@/types/studentTribute';
 
 // Fetch all student tributes for a farewell page
 export function useStudentTributes(pageId?: string) {
@@ -16,7 +16,12 @@ export function useStudentTributes(pageId?: string) {
         .order('sort_order');
       
       if (error) throw error;
-      return data as StudentTribute[];
+      // Map database results to typed StudentTribute with theme
+      return (data || []).map(item => ({
+        ...item,
+        traits: item.traits || [],
+        theme: (item.theme as StudentTheme) || 'playful',
+      })) as StudentTribute[];
     },
     enabled: !!pageId,
   });
@@ -50,13 +55,18 @@ export function useCreateStudentTribute() {
           class_section: data.class_section || null,
           traits: data.traits || [],
           route_slug: data.route_slug || null,
+          theme: data.theme || 'playful',
           sort_order: nextOrder,
         })
         .select()
         .single();
       
       if (error) throw error;
-      return result as StudentTribute;
+      return {
+        ...result,
+        traits: result.traits || [],
+        theme: (result.theme as StudentTheme) || 'playful',
+      } as StudentTribute;
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['student_tributes', variables.pageId] });
@@ -81,7 +91,11 @@ export function useUpdateStudentTribute() {
         .single();
       
       if (error) throw error;
-      return result as StudentTribute;
+      return {
+        ...result,
+        traits: result.traits || [],
+        theme: (result.theme as StudentTheme) || 'playful',
+      } as StudentTribute;
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['student_tributes', variables.pageId] });
