@@ -13,7 +13,7 @@ export function useStudentTributes(pageId?: string) {
         .from('student_tributes')
         .select('*')
         .eq('page_id', pageId)
-        .order('sort_order');
+        .order('sort_order', { ascending: true });
       
       if (error) throw error;
       // Map database results to typed StudentTribute with theme

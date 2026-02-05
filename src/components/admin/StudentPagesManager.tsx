@@ -27,7 +27,8 @@ import {
   useCreateAchievement, 
   useDeleteAchievement 
 } from '@/hooks/useStudentAchievements';
-import type { StudentTribute, StudentTributeFormData, StudentTheme, THEME_OPTIONS } from '@/types/studentTribute';
+import type { StudentTribute, StudentTributeFormData, StudentTheme } from '@/types/studentTribute';
+import { THEME_OPTIONS } from '@/types/studentTribute';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -47,12 +48,8 @@ import {
 } from '@/components/ui/select';
 
 // Theme options with visual styling
-const themeOptions: typeof THEME_OPTIONS = [
-  { value: 'playful', label: '🎉 Playful', description: 'Bright colors, confetti, fun animations', colors: 'from-pink-500 via-purple-500 to-indigo-500' },
-  { value: 'navy', label: '⚓ Navy', description: 'NCS Airways flight theme', colors: 'from-blue-600 via-blue-700 to-blue-800' },
-  { value: 'army', label: '🎖️ Army', description: 'Camouflage accents, medal-style badges', colors: 'from-green-700 via-green-800 to-green-900' },
-  { value: 'classic', label: '🎓 Classic', description: 'Formal graduation style with gold accents', colors: 'from-amber-600 via-yellow-600 to-amber-700' },
-];
+// Use THEME_OPTIONS from types
+const themeOptions = THEME_OPTIONS;
 
 const achievementIcons = [
   { value: 'trophy', label: '🏆 Trophy' },
