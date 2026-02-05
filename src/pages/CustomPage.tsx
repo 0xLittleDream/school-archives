@@ -14,6 +14,7 @@ import { GallerySection } from '@/components/page-sections/GallerySection';
 import { StatsSection } from '@/components/page-sections/StatsSection';
 import { QuoteSection } from '@/components/page-sections/QuoteSection';
 import { CTASection } from '@/components/page-sections/CTASection';
+import { StudentDirectorySection } from '@/components/page-sections/StudentDirectorySection';
 import { StudentTributeCarousel } from '@/components/student-tributes/StudentTributeCarousel';
 import type { PageSection } from '@/types/pageBuilder';
 
@@ -105,6 +106,8 @@ const CustomPage = () => {
         return <QuoteSection key={section.id} section={section} />;
       case 'cta':
         return <CTASection key={section.id} section={section} />;
+      case 'student_directory':
+        return <StudentDirectorySection key={section.id} section={section} pageId={page.id} />;
       default:
         return null;
     }

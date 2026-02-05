@@ -141,7 +141,14 @@ export function StudentPagesManager() {
 
     const filteredTraits = (editForm.traits || []).filter(t => t.trim() !== '');
     const data: StudentTributeFormData = {
-      ...editForm,
+      student_name: editForm.student_name,
+      full_name: editForm.full_name,
+      photo_url: editForm.photo_url,
+      quote: editForm.quote,
+      future_dreams: editForm.future_dreams,
+      class_section: editForm.class_section,
+      route_slug: editForm.route_slug,
+      theme: editForm.theme,
       traits: filteredTraits,
     };
 
