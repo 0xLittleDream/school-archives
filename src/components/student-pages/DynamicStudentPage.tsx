@@ -54,6 +54,12 @@ export const DynamicStudentPage = () => {
     enabled: !!slug && !customPage,
   });
 
+  // If no slug provided, this route shouldn't handle the request - redirect to home
+  // This prevents the /:slug route from incorrectly catching "/" or empty paths
+  if (!slug) {
+    return <Navigate to="/" replace />;
+  }
+
   // Show loading while checking page type
   if (isLoadingPage) {
     return (
